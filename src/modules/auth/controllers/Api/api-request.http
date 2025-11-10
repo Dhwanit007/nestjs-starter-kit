@@ -1,0 +1,29 @@
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user3@example.com",
+  "name": "UserName",
+  "phoneNumber": "+911234567890",
+  "password": "Password@123"
+}
+
+### Login User
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user2@example.com",
+  "password": "Password@123"
+}
+
+### Logout Api
+POST http://localhost:3000/api/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInRva2VuSWQiOiI1OWQ5NjQ2Ny0zNjBkLTRhNTUtODg3MS0xMTlkMzI5NGYwNjQiLCJpYXQiOjE3NTY1NjA4MjksImV4cCI6MTc1NjY0NzIyOX0.YB8P-ViCeF_MYryd7_nIZIH0ItAUDE6sBjgBGDOM65U
+
+### Get User Profile
+GET http://localhost:3000/api/auth/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInRva2VuSWQiOiIxNmVlM2EwYi01YjgzLTQyZDUtOTcyNS1kOGE5YWExZWFmMmYiLCJpYXQiOjE3NTY1NjE5NzMsImV4cCI6MTc1NjY0ODM3M30.2N2ed-8DiW5pd7wU-srbBjAPN6uR5hwSC5eS6fye-4g
+
+###
+GET http://localhost:3000

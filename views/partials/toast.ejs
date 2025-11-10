@@ -1,0 +1,35 @@
+<% if (locals.toast != "") { %>
+  <script>
+    const toast = JSON.parse('<%- JSON.stringify(locals.toast) %>');
+    const options = {
+        error: {
+          gravity: "top",
+          position: "right",
+          style: {
+            background: "linear-gradient(to right, #ff5f6d, #ffc371)"
+          },
+        },
+        success: {
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: "linear-gradient(to right, #56ab2f, #a8e063)"
+          }
+        }
+      }
+    if (toast.message) {
+      
+      Toastify({
+        text: toast.message,
+        duration: 3000,
+        ...options[toast.type]
+      }).showToast();
+    } else {
+      Toastify({
+        text: toast[0],
+        duration: 3000,
+        ...options.success
+      }).showToast();
+    }
+  </script>
+<% } %>

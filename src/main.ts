@@ -1,0 +1,71 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './modules/app/app.module';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { join } from 'path';
+
+import * as methodOverride from 'method-override';
+import * as session from 'express-session';
+import * as cookieParser from 'cookie-parser';
+import * as flash from 'connect-flash';
+import * as i18n from 'i18n-express';
+import { log } from './utils/logger'; // adjust path as needed
+import { Logger } from 'winston';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const fileUpload = require('express-fileupload');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const expressLayouts = require('express-ejs-layouts');
+declare global {
+  // Add this to make log available everywhere
+  var log: Logger;
+}
+async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  app.use(methodOverride('_method'));
+
+  // Set up view engine
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('ejs');
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  app.use(cookieParser());
+  app.set('layout', 'layouts/layout');
+  app.use(expressLayouts);
+  app.use(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    session({
+      secret: 'nodedemo',
+      resave: false,
+      saveUninitialized: true,
+    }),
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  (global as any).log = log;
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  app.use(flash());
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  app.use(fileUpload());
+  app.use(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    i18n({
+      translationsPath: join(__dirname, '..', 'i18n'),
+      siteLangs: ['ar', 'ch', 'en', 'fr', 'ru', 'it', 'gr', 'sp'],
+      textsVarName: 'translation',
+    }),
+  );
+  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalInterceptors(new ResponseInterceptor());
+
+  await app.listen(process.env.PORT ?? 9000);
+}
+void bootstrap();

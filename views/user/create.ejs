@@ -1,0 +1,136 @@
+<%- contentFor('HeaderCss') %>
+ <%- include("../partials/title-meta", { "title" : "Login" }) %>
+  <%- contentFor('body') %>
+   <div class="">
+    <div class="row w-50 ">
+     <div class="">
+      <div class="card">
+       <div class="card-header align-items-center d-flex">
+        <h4 class="card-title mb-0 flex-grow-1">Create User Form</h4>
+        <div class="flex-shrink-0">
+         <!-- <div class="form-check form-switch form-switch-right form-switch-md">
+         <label for="form-grid-showcode" class="form-label text-muted">Show Code</label>
+         <input class="form-check-input code-switcher" type="checkbox" id="form-grid-showcode">
+        </div> -->
+        </div>
+       </div><!-- end card header -->
+
+       <div class="card-body ">
+        <!-- <p class="text-muted">More complex forms can be built using our grid classes. Use these for form layouts that
+        require multiple columns, varied widths, and additional alignment options. <span class="fw-medium">Requires the
+         <code>$enable-grid-classes</code> Sass variable to be enabled</span> (on by default).
+        </p> -->
+        <div class="live-preview">
+         <form class="needs-validation" id="create-user-form" action="/users" method="POST" novalidate>
+          <div class="row">
+           <div class="">
+            <div class="mb-3">
+             <label for="nameinput" class="form-label">Name</label>
+             <input type="text" class="form-control" name="name" value="<%- old ? old.name : '' %>"
+              placeholder="Enter your name" id="nameinput" required>
+             <% if (errors && errors.name) { %>
+              <div class="text-danger">
+               <%= errors.name[0] %>
+              </div>
+              <% } %>
+            </div>
+           </div>
+           <!--end col-->
+           <!-- <div class="col-md-6">
+           <div class="mb-3">
+            <label for="lastNameinput" class="form-label">Last Name</label>
+            <input type="text" class="form-control" placeholder="Enter your lastname" id="lastNameinput">
+           </div>
+          </div> -->
+           <!--end col-->
+           <!-- <div class="col-md-12">
+           <div class="mb-3">
+            <label for="compnayNameinput" class="form-label">Company Name</label>
+            <input type="text" class="form-control" placeholder="Enter company name" id="compnayNameinput">
+           </div>-->
+          </div>
+          <!--end col-->
+          <div class="">
+           <div class="mb-3">
+            <label for="phonenumberInput" class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" name="phoneNumber" value="<%- old ? old.phoneNumber : '' %>"
+             placeholder="+(245) 451 45123" id="phonenumberInput" required>
+            <% if (errors && errors.phoneNumber) { %>
+             <div class="text-danger">
+              <%= errors.phoneNumber[0] %>
+             </div>
+             <% } %>
+           </div>
+           <!--end col-->
+           <div class="">
+            <div class="mb-3">
+             <label for="emailidInput" class="form-label">Email Address</label>
+             <input type="email" class="form-control" name="email" value="<%- old ? old.email : '' %>"
+              placeholder="example@gamil.com" id="emailidInput" required>
+             <% if (errors && errors.email) { %>
+              <div class="text-danger">
+               <%= errors.email[0] %>
+              </div>
+              <% } %>
+            </div>
+           </div>
+           <!--end col-->
+           <div class="">
+            <div class="mb-3">
+             <label for="passwordInput" class="form-label">Password</label>
+             <input type="password" class="form-control" name="password" value="<%- old ? old.password : '' %>"
+              placeholder="Enter your password" id="emailidInput" required>
+             <% if (errors && errors.password) { %>
+              <div class="text-danger">
+               <%= errors.password[0] %>
+              </div>
+              <% } %>
+            </div>
+           </div>
+           <!--end col-->
+           <!-- <div class="col-md-12">
+           <div class="mb-3">
+            <label for="address1ControlTextarea" class="form-label">Address</label>
+            <input type="text" class="form-control" placeholder="Address 1" id="address1ControlTextarea">
+           </div>
+          </div> -->
+           <!--end col-->
+           <!-- <div class="col-md-6">
+           <div class="mb-3">
+            <label for="citynameInput" class="form-label">City</label>
+            <input type="email" class="form-control" placeholder="Enter your city" id="citynameInput">
+           </div>
+          </div> -->
+           <!--end col-->
+           <!-- <div class="col-md-6">
+           <div class="mb-3">
+            <label for="ForminputState" class="form-label">State</label>
+            <select id="ForminputState" class="form-select" data-choices data-choices-sorting="true">
+             <option selected>Choose...</option>
+             <option>...</option>
+            </select>
+           </div>
+          </div> -->
+           <!--end col-->
+           <div class="row">
+            <div class="col">
+             <button type="submit" class="btn btn-primary">
+             Create
+            </button>
+            </div>
+           </div>
+           <!--end col-->
+          </div>
+          <!--end row-->
+         </form>
+        </div>
+        <div class="d-none code-view">
+        </div>
+       </div>
+      </div>
+     </div> <!-- end col -->
+    </div>
+    <%- contentFor('FooterJs') %>
+
+
+<script src="/assets/js/global-form-validate.js"> </script>
