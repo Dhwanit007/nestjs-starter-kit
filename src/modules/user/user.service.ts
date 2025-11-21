@@ -3,14 +3,75 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginateQuery, Paginated, paginate } from 'nestjs-paginate';
+import { Repository } from 'typeorm';
+
+import { UpdateUserDto } from './dto/request/update-user.dto';
 import { User } from './user.entity';
-import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 
 @Injectable()
 export class UserService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
+
+  async updateUser2(id: number, input: Partial<UpdateUserDto>) {
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('User not found!');
+
+    Object.assign(user, input);
+    return await this.repo.save(user);
+  }
+
+  async deleteUser(id: number) {
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('User not found!');
+
+    await this.repo.delete(user);
+
+    return { message: 'User Successfully Deleted!' };
+  }
+
+  async getAgeChartData() {
+    const users = await this.repo.find();
+
+    const data: Record<string, number> = {};
+
+    users.forEach((user) => {
+      if (!user.dob) {
+        return;
+      }
+      const year = user.dob.getFullYear();
+
+      const rangeStart = Math.floor(year / 5) * 5;
+      const rangeEnd = rangeStart + 4;
+
+      const rangeKey = `${rangeStart}-${rangeEnd}`;
+
+      if (!(rangeKey in data)) {
+        data[rangeKey] = 1;
+      } else {
+        data[rangeKey] += 1;
+      }
+    });
+
+    return data;
+  }
+
+  async getGenderChartData() {
+    const users = await this.repo.find();
+
+    const data: Record<string, number> = {};
+
+    users.forEach((user) => {
+      if (!(user.gender in data)) {
+        data[user.gender] = 1;
+      } else {
+        data[user.gender] += 1;
+      }
+    });
+
+    return data;
+  }
 
   async find(query: PaginateQuery): Promise<Paginated<User>> {
     const results = await paginate(query, this.repo, {
@@ -29,6 +90,7 @@ export class UserService {
         'id',
         'createdAt',
         'updatedAt',
+        'language',
       ],
       defaultSortBy: [['id', 'ASC']],
       defaultLimit: 10,
@@ -42,8 +104,12 @@ export class UserService {
     return this.repo.findOne({ where: { email } });
   }
 
-  findOne(id: number) {
-    return this.repo.findOne({ where: { id } });
+  async findOne(id: number) {
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not Found!!');
+    }
+    return user;
   }
 
   async create(attributes: Partial<User>) {

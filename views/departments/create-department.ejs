@@ -1,0 +1,164 @@
+<%- contentFor('HeaderCss') %>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        #departmentsTable_filter {
+            float: right;
+        }
+    </style>
+    <%- contentFor('body') %>
+
+        <div>
+            <div class="card shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Create Department</h4>
+                    <a href="/departments" class="btn btn-secondary btn-sm">Back</a>
+                </div>
+
+                <div class="card-body">
+
+                    <!-- SUCCESS / ERROR MESSAGE -->
+                    <% if (message && message.text) { %>
+                        <div class="alert alert-success">
+                            <%= message.text %>
+                        </div>
+                        <% } %>
+
+                            <% if (error && error.text) { %>
+                                <div class="alert alert-danger">
+                                    <%= error.text %>
+                                </div>
+                                <% } %>
+
+                                    <form id="createDepartmentForm">
+                                        <!-- NAME -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Department Name <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" name="name" class="form-control"
+                                                placeholder="Enter department name" required>
+                                        </div>
+
+                                        <!-- DESCRIPTION -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Description</label>
+                                            <textarea name="description" class="form-control" rows="3"
+                                                placeholder="Optional description"></textarea>
+                                        </div>
+
+                                        <!-- ASSIGN EMPLOYEES -->
+                                        <!-- <div class="mb-3">
+                                            <label class="form-label">Assign Employees</label>
+                                            <select name="assignedEmployeeIds" id="assignedEmployeeIds"
+                                                class="form-control" multiple>
+                                                <option disabled>Loading employees...</option>
+                                            </select>
+                                        </div> -->
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Assign Employees</label>
+                                            <select name="assignedEmployeeIds" id="employeeSelect" class="form-control"
+                                                multiple>
+                                                <% if (employees && employees.length) { %>
+                                                    <% employees.forEach(emp=> { %>
+                                                        <option value="<%= emp.id %>">
+                                                            <%= emp.name %> (<%= emp.email %>)
+                                                        </option>
+                                                        <% }) %>
+                                                            <% } else { %>
+                                                                <option disabled>No employees found</option>
+                                                                <% } %>
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary w-100">Create Department</button>
+                                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Select2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                // Initialize Select2
+                $('#assignedEmployeeIds').select2({
+                    placeholder: "Select employees",
+                    allowClear: true,
+                    width: '100%'
+                });
+
+                // Load employees via AJAX
+                function loadEmployees() {
+                    $.ajax({
+                        url: '/api/employee/newall', // your route
+                        method: 'GET',
+                        success: function (res) {
+                            // If API returns { data: [...] } adjust here
+                            let employees = res.data || res;
+
+                            if (!Array.isArray(employees)) {
+                                console.error("Employees response is not an array", employees);
+                                $('#assignedEmployeeIds').html('<option disabled>No employees found</option>');
+                                return;
+                            }
+
+                            let select = $('#assignedEmployeeIds');
+                            select.empty(); // clear existing options
+
+                            employees.forEach(emp => {
+                                select.append(`<option value="${emp.id}">${emp.name}</option>`);
+                            });
+
+                            // Refresh Select2
+                            select.trigger('change');
+                        },
+                        error: function (err) {
+                            console.error("Failed to load employees", err);
+                            $('#assignedEmployeeIds').html('<option disabled>Failed to load employees</option>');
+                        }
+                    });
+                }
+
+                loadEmployees();
+
+                // Handle form submission
+                $('#createDepartmentForm').on('submit', function (e) {
+                    e.preventDefault();
+
+                    let selectedEmployees = $('#assignedEmployeeIds').val() || [];
+
+                    let payload = {
+                        name: $('input[name="name"]').val(),
+                        description: $('textarea[name="description"]').val(),
+                        assignedEmployeeIds: selectedEmployees
+                    };
+
+                    $.ajax({
+                        url: '/departments/create',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(payload),
+                        success: function (res) {
+                            alert('Department created successfully!');
+                            window.location.href = '/departments';
+                        },
+                        error: function (err) {
+                            console.error(err);
+                            alert('Failed to create department');
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <%- contentFor('FooterJs') %>
+            <script>
+                $('#employeeSelect').select2({
+                    placeholder: "Select employees",
+                    allowClear: true,
+                    width: '100%'
+                });
+            </script>

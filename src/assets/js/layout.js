@@ -23,7 +23,7 @@ File: Layout Js File
           });
         if(sessionStorage.getItem('defaultAttribute') !== JSON.stringify(CurrentLayoutAttributes)) {
             sessionStorage.clear();
-            window.location.reload();
+            // window.location.reload();
         } else {
             var isLayoutAttributes = {};
             isLayoutAttributes['data-layout'] = sessionStorage.getItem('data-layout');

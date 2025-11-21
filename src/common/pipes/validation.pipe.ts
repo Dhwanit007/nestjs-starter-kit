@@ -6,12 +6,13 @@ import {
   PipeTransform,
   Scope,
 } from '@nestjs/common';
-import { validate } from 'class-validator';
-import { plainToInstance } from 'class-transformer';
-import { randomUUID } from 'crypto';
-import { ResponseUtil } from '../utils/response.util';
-import { ValidationError } from '../interfaces/api-response.interface';
 import { REQUEST } from '@nestjs/core';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
+import { randomUUID } from 'crypto';
+
+import { ValidationError } from '../interfaces/api-response.interface';
+import { ResponseUtil } from '../utils/response.util';
 
 @Injectable({ scope: Scope.REQUEST })
 export class CustomValidationPipe implements PipeTransform<any> {
@@ -20,6 +21,16 @@ export class CustomValidationPipe implements PipeTransform<any> {
 
   async transform(value: any, { metatype }: ArgumentMetadata) {
     if (!metatype || !this.toValidate(metatype)) {
+      return value;
+    }
+
+    // Skip validation if value is already an instance of the metatype (e.g., from decorators)
+    if (value && value.constructor === metatype) {
+      return value;
+    }
+
+    // Skip validation if value is undefined or null (e.g., from custom decorators)
+    if (value === undefined || value === null) {
       return value;
     }
 

@@ -1,12 +1,16 @@
 import { Expose } from 'class-transformer';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
   DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+
+// import { Chat } from '../chat/chat.entity';
+
 @Entity()
 export class User {
   /* ----------------------Structure---------------------- */
@@ -25,6 +29,21 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({ nullable: true })
+  dob: Date;
+
+  @Column({ default: 'Hindi' })
+  language: string;
+
+  @Column({ default: 'male' })
+  gender: 'male' | 'female';
+
+  // @OneToMany(() => Chat, (chat) => chat.sender)
+  // senderChats: Chat[];
+
+  // @OneToMany(() => Chat, (chat) => chat.recipient)
+  // recipientChats: Chat[];
 
   @CreateDateColumn({ type: 'timestamp', nullable: true })
   createdAt: Date;

@@ -1,35 +1,48 @@
-<% if (locals.toast != "") { %>
+<% if (locals.toast !="" ) { %>
   <script>
     const toast = JSON.parse('<%- JSON.stringify(locals.toast) %>');
     const options = {
-        error: {
-          gravity: "top",
-          position: "right",
-          style: {
-            background: "linear-gradient(to right, #ff5f6d, #ffc371)"
-          },
+      error: {
+        gravity: "bottom",
+        position: "right",
+        style: {
+          background: "linear-gradient(to right, #ff5f6d, #ffc371)"
         },
-        success: {
-          gravity: "bottom",
-          position: "right",
-          style: {
-            background: "linear-gradient(to right, #56ab2f, #a8e063)"
-          }
+      },
+      success: {
+        gravity: "bottom",
+        position: "right",
+        style: {
+          background: "linear-gradient(to right, #56ab2f, #a8e063)"
         }
       }
-    if (toast.message) {
-      
-      Toastify({
-        text: toast.message,
-        duration: 3000,
-        ...options[toast.type]
-      }).showToast();
-    } else {
-      Toastify({
-        text: toast[0],
-        duration: 3000,
-        ...options.success
-      }).showToast();
     }
+    if (toast) {
+      let text = '';
+      let type = 'success';
+
+      // Handle both string and object
+      if (typeof toast === 'string') {
+        text = toast;
+      } else if (toast.message) {
+        text = toast.message;
+        type = toast.type || 'success';
+      } else if (Array.isArray(toast)) {
+        text = toast[0];
+      }
+
+      if (text.trim() !== '') {
+        Toastify({
+          text,
+          duration: 3000,
+          gravity: 'top',
+          position: 'right',
+          close: true,
+          backgroundColor:
+            type === 'error' ? '#f44336' : '#4caf50',
+        }).showToast();
+      }
+    }
+
   </script>
-<% } %>
+  <% } %>

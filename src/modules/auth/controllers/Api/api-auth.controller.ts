@@ -4,20 +4,21 @@ import {
   Controller,
   Get,
   Post,
-  UseGuards,
   Request,
+  UseGuards,
 } from '@nestjs/common';
-import { RegisterDto } from '../../dto/request/register.dto';
-import { UserAuthDto } from '../../dto/response/user-auth.dto';
-import { Serialize } from 'src/interceptors/serialize.interceptor';
-import { AuthService } from '../../auth.service';
-import { LoginDto } from '../../dto/request/login.dto';
+import { Request as ExpressRequest } from 'express';
+import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { CurrentUser } from 'src/modules/user/decorators/current-user.decorator';
 import { User } from 'src/modules/user/user.entity';
+
+import { AuthService } from '../../auth.service';
+import { LoginDto } from '../../dto/request/login.dto';
+import { RegisterDto } from '../../dto/request/register.dto';
+import { UserAuthDto } from '../../dto/response/user-auth.dto';
 import { UserDetailDto } from '../../dto/response/user-detail.dto';
-import { LocalAuthGuard } from '../../guards/local-auth.guard';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
-import { Request as ExpressRequest } from 'express';
+import { LocalAuthGuard } from '../../guards/local-auth.guard';
 
 @Controller('api/auth')
 export class ApiAuthController {
@@ -37,8 +38,6 @@ export class ApiAuthController {
   @UseGuards(LocalAuthGuard)
   @Serialize(UserAuthDto)
   async login(@Body() body: LoginDto, @CurrentUser() user: User) {
-    console.log('login  hit', typeof user);
-    console.log(body);
     user.accessToken = await this.authService.generateAccessToken(user);
     return { message: 'Login successful', payload: user };
   }

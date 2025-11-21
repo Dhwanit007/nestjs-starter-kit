@@ -41,6 +41,9 @@ module.exports = {
             }),
         ],
     },
+    watchOptions: {
+        ignored: ['**/*.env']
+    },
     module: {
         rules: [
             {

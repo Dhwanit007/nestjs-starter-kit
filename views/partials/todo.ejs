@@ -1,0 +1,35 @@
+<!-- To-Do List Section -->
+<div class="sidebar-todo p-3 border-top">
+    <h6 class="text-muted mb-2">📝 Today’s Tasks</h6>
+
+    <form action="/todos" method="POST" class="d-flex mb-2">
+        <input type="text" name="task" placeholder="Add new task..." class="form-control form-control-sm" required />
+        <button type="submit" class="btn btn-sm btn-primary ms-2">Add</button>
+    </form>
+
+    <ul class="list-unstyled todo-list" style="max-height: 150px; overflow-y: auto;">
+        <% if (todos && todos.length) { %>
+            <% todos.forEach(todo=> { %>
+                <li class="d-flex align-items-center justify-content-between py-1">
+                    <form action="/todos/toggle/<%= todo.id %>" method="POST" class="d-flex align-items-center w-100">
+                        <input type="checkbox" name="completed" onChange="this.form.submit()" <%=todo.completed
+                            ? 'checked' : '' %>
+                        />
+                        <span
+                            class="ms-2 flex-grow-1 <%= todo.completed ? 'text-decoration-line-through text-muted' : '' %>">
+                            <%= todo.task %>
+                        </span>
+                        <small class="text-muted">
+                            <%= todo.date %>
+                        </small>
+                    </form>
+                    <form action="/todos/<%= todo.id %>?_method=DELETE" method="POST" class="ms-2">
+                        <button type="submit" class="btn btn-sm btn-link text-danger p-0">✕</button>
+                    </form>
+                </li>
+                <% }) %>
+                    <% } else { %>
+                        <li class="text-muted small">No tasks for today</li>
+                        <% } %>
+    </ul>
+</div>

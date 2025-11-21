@@ -2087,7 +2087,7 @@ File: Main Js File
 		if (document.getElementById("reset-layout")) {
 			document.getElementById("reset-layout").addEventListener("click", function () {
 				sessionStorage.clear();
-				window.location.reload();
+				// window.location.reload();
 			});
 		}
 	}

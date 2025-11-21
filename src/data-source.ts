@@ -1,9 +1,13 @@
+import * as dotenv from 'dotenv';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { User } from './modules/user/user.entity';
-import { User2 } from './modules/user2/user2.entity';
-import * as dotenv from 'dotenv';
+
 import { OAuthAccessToken } from './modules/oauth-access-token/oauth-access-token.entity';
+import { Todo } from './modules/todos/entities/todo.entity';
+import { User } from './modules/user/user.entity';
+import { Employee } from './modules/employee/entities/employee.entity';
+import { Projects } from './modules/projects/entities/projects.entity';
+import { Departments } from './modules/departments/entities/department.entity';
 
 // we can't access configService directly here because this file is loaded before the AppModule
 dotenv.config();
@@ -15,8 +19,8 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  synchronize: true, //configService.get<boolean>('database.synchronize', false),
-  entities: [User, OAuthAccessToken, User2],
+  synchronize: false, //configService.get<boolean>('database.synchronize', false),
+  entities: [User, OAuthAccessToken, Todo , Employee , Projects , Departments],
   migrations: [__dirname + '/database/migrations/*.ts'],
   // logging: true,
   // logging: 'all', //for sql queries logging

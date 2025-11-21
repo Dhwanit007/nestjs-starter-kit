@@ -1,0 +1,189 @@
+<%- contentFor('HeaderCss') %>
+
+  <!-- swiper css -->
+  <link rel="stylesheet" href="/assets/libs/swiper/swiper-bundle.min.css">
+
+  <%- contentFor('body') %>
+    <div class="profile-foreground position-relative mx-n4 mt-n4">
+      <div class="profile-wid-bg">
+        <img src="/assets/images/profile-bg.jpg" alt="" class="profile-wid-img" />
+      </div>
+    </div>
+
+    <div class="pt-4 mb-4 mb-lg-3 pb-lg-4 profile-wrapper">
+      <div class="row g-4">
+        <div class="col-auto">
+          <div class="avatar-lg">
+            <img src="/assets/images/users/avatar-1.jpg" alt="user-img" class="img-thumbnail rounded-circle" />
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="p-2">
+            <h3 class="text-white mb-1">Dhwanit Parani</h3>
+            <p class="text-white text-opacity-75">Software Developer</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <div>
+          <div class="d-flex profile-wrapper">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-pills animation-nav profile-nav gap-2 gap-lg-3 flex-grow-1" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link fs-14 active" data-bs-toggle="tab" href="#overview-tab" role="tab">
+                  <i class="ri-airplay-fill d-inline-block d-md-none"></i>
+                  <span class="d-none d-md-inline-block">Overview</span>
+                </a>
+              </li>
+            </ul>
+
+            <div class="flex-shrink-0">
+              <a href="/user/pages-profile-settings" class="btn btn-success">
+                <i class="ri-edit-box-line align-bottom"></i> Edit Profile
+              </a>
+            </div>
+          </div>
+
+          <!-- Tab panes -->
+          <div class="tab-content pt-4 text-muted">
+            <div class="tab-pane active" id="overview-tab" role="tabpanel">
+              <div class="row">
+
+                <!-- LEFT SIDEBAR -->
+                <div class="col-xxl-3">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title mb-3">Info</h5>
+
+                      <div class="table-responsive">
+                        <table class="table table-borderless mb-0">
+                          <tbody>
+                            <tr>
+                              <th class="ps-0">Full Name :</th>
+                              <td class="text-muted">Dhwanit Parani</td>
+                            </tr>
+
+                            <tr>
+                              <th class="ps-0">Mobile :</th>
+                              <td class="text-muted">+91 98765 43210</td>
+                            </tr>
+
+                            <tr>
+                              <th class="ps-0">E-mail :</th>
+                              <td class="text-muted">dhwanitparani@email.com</td>
+                            </tr>
+
+                            <tr>
+                              <th class="ps-0">Location :</th>
+                              <td class="text-muted">Ahmedabad, India</td>
+                            </tr>
+
+                            <tr>
+                              <th class="ps-0">Joining Date</th>
+                              <td class="text-muted">15 Jan 2023</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <!-- Skills -->
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title mb-4">Skills</h5>
+
+                      <div class="d-flex flex-wrap gap-2 fs-15">
+                        <a class="badge bg-primary-subtle text-primary">HTML</a>
+                        <a class="badge bg-primary-subtle text-primary">CSS</a>
+                        <a class="badge bg-primary-subtle text-primary">JavaScript</a>
+                        <a class="badge bg-primary-subtle text-primary">React.js</a>
+                        <a class="badge bg-primary-subtle text-primary">Node.js</a>
+                        <a class="badge bg-primary-subtle text-primary">Express.js</a>
+                        <a class="badge bg-primary-subtle text-primary">MongoDB</a>
+                        <a class="badge bg-primary-subtle text-primary">PHP</a>
+                        <a class="badge bg-primary-subtle text-primary">MySQL</a>
+                        <a class="badge bg-primary-subtle text-primary">TypeScript</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- RIGHT SIDEBAR -->
+                <div class="col-xxl-9">
+                  <div class="card">
+                    <div class="card-body">
+
+                      <h5 class="card-title mb-3">About</h5>
+
+                      <p>
+                        Hi, I’m <strong>Dhwanit Parani</strong>, a passionate Software Developer with experience in
+                        full-stack web development. I enjoy building efficient, scalable, and user-friendly
+                        applications using the MERN stack, PHP, MySQL, and TypeScript.
+                      </p>
+
+                      <p>
+                        I focus on writing clean and maintainable code, improving UI/UX, and learning new technologies.
+                        My projects include real-time chat apps, admin dashboards, API integrations, and complete MERN
+                        stack applications.
+                      </p>
+
+                      <div class="row">
+                        <div class="col-6 col-md-4">
+                          <div class="d-flex mt-4">
+                            <div class="flex-shrink-0 avatar-xs align-self-center me-3">
+                              <div class="avatar-title bg-light rounded-circle fs-16 text-primary material-shadow">
+                                <i class="ri-user-2-fill"></i>
+                              </div>
+                            </div>
+                            <div class="flex-grow-1 overflow-hidden">
+                              <p class="mb-1">Designation :</p>
+                              <h6 class="text-truncate mb-0">Software Developer</h6>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="col-6 col-md-4">
+                          <div class="d-flex mt-4">
+                            <div class="flex-shrink-0 avatar-xs align-self-center me-3">
+                              <div class="avatar-title bg-light rounded-circle fs-16 text-primary material-shadow">
+                                <i class="ri-global-line"></i>
+                              </div>
+                            </div>
+                            <div class="flex-grow-1 overflow-hidden">
+                              <p class="mb-1">Portfolio :</p>
+                              <a href="#" class="fw-semibold">dhwanit.dev</a>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <%- contentFor('FooterJs') %>
+
+      <!-- swiper js -->
+      <script src="/assets/libs/swiper/swiper-bundle.min.js"></script>
+
+      <!-- profile init js -->
+      <script src="/assets/js/pages/profile.init.js"></script>
+
+      <!-- App js -->

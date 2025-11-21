@@ -7,7 +7,9 @@ export class ViewLocalsMiddleware implements NestMiddleware {
     // res.locals.authUser = req.user;
     res.locals.error = req.flash('error');
     // res.locals.oldInput = req.body;
+    // console.log(req.flash('toast'))
     res.locals.toast = req.flash('toast');
+    // console.log(res.locals.toast);
     next();
   }
 }

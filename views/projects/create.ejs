@@ -1,0 +1,69 @@
+<%- contentFor('HeaderCss') %>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
+    <%- contentFor('body') %>
+
+        <div>
+            <div>
+                <div class="card">
+
+                    <!-- Header -->
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Create Project</h5>
+                        <a href="/projects" class="btn btn-primary">Back</a>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="card-body">
+                        <form action="/api/projects/create" method="POST">
+
+                            <!-- Project Name -->
+                            <div class="mb-3">
+                                <label class="form-label">Project Name</label>
+                                <input type="text" name="name" class="form-control" value="">
+                            </div>
+
+                            <!-- Project Description -->
+                            <div class="mb-3">
+                                <label class="form-label">Project Description</label>
+                                <textarea name="description" class="form-control" rows="3"></textarea>
+                            </div>
+
+                            <!-- Assigned Employees -->
+                            <div class="mb-3">
+                                <label class="form-label">Assign Employees</label>
+                                <select name="assignedEmployeeIds" id="employeeSelect" class="form-control" multiple>
+                                    <% if (employees && employees.length) { %>
+                                        <% employees.forEach(emp=> { %>
+                                            <option value="<%= emp.id %>">
+                                                <%= emp.name %> (<%= emp.email %>)
+                                            </option>
+                                            <% }) %>
+                                                <% } else { %>
+                                                    <option disabled>No employees found</option>
+                                                    <% } %>
+                                </select>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button class="btn btn-primary w-100 mt-3">Create Project</button>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <%- contentFor('FooterJs') %>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+            <script>
+                $('#employeeSelect').select2({
+                    placeholder: "Select employees",
+                    allowClear: true,
+                    width: '100%'
+                });
+            </script>

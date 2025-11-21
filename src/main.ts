@@ -1,19 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './modules/app/app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { join } from 'path';
-
-import * as methodOverride from 'method-override';
-import * as session from 'express-session';
-import * as cookieParser from 'cookie-parser';
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as flash from 'connect-flash';
+import * as cookieParser from 'cookie-parser';
+import * as express from 'express';
+import * as session from 'express-session';
 import * as i18n from 'i18n-express';
-import { log } from './utils/logger'; // adjust path as needed
+import * as methodOverride from 'method-override';
+import { join } from 'path';
+// adjust path as needed
 import { Logger } from 'winston';
+
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { ViewLocalsMiddleware } from './common/middlewares/view-locals.middleware';
+import { AppModule } from './modules/app/app.module';
+import { TodosService } from './modules/todos/todos.service';
+import { log } from './utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const fileUpload = require('express-fileupload');
@@ -28,6 +32,16 @@ async function bootstrap() {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   app.use(methodOverride('_method'));
+
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json());
+
+  const todosService = app.get(TodosService);
+
+  app.use((req, res, next) => {
+    res.locals.todos = todosService.findAll();
+    next();
+  });
 
   // Set up view engine
   app.useStaticAssets(join(__dirname, '..', 'public'));
@@ -47,11 +61,13 @@ async function bootstrap() {
     }),
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  (global as any).log = log;
-
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   app.use(flash());
+
+  app.use(new ViewLocalsMiddleware().use);
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  (global as any).log = log;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   app.use(fileUpload());

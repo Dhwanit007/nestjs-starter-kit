@@ -1,38 +1,39 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
+  BadRequestException,
+  Body,
   Controller,
+  Delete,
   Get,
+  NotFoundException,
+  Param,
   Post,
   Put,
-  Delete,
-  Param,
-  Body,
-  NotFoundException,
-  Res,
-  Req,
-  UseGuards,
   Query,
-  BadRequestException,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-import { UpdateUserDto } from '../../dto/request/update-user.dto';
-import { UserService } from '../../user.service';
-import { UserDto } from '../../dto/response/user.dto';
-import { PaginateQuery } from 'nestjs-paginate';
 import { plainToInstance } from 'class-transformer';
-import { AuthGuard } from '../../../../guards/auth.guard';
-
 import { Request, Response } from 'express';
+import { PaginateQuery } from 'nestjs-paginate';
+
+import { AuthGuard } from '../../../../common/guards/auth.guard';
 import { CreateUserDto } from '../../dto/request/create-user.dto';
+import { UpdateUserDto } from '../../dto/request/update-user.dto';
+import { UserDto } from '../../dto/response/user.dto';
+import { UserService } from '../../user.service';
 
 @Controller('users')
 @UseGuards(AuthGuard)
 export class UserController {
   constructor(private userService: UserService) {}
+
   @Get()
   async getUserList(
     @Req() request: Request,
-    @Query() query: any,
+    @Query() query: PaginateQuery,
     @Res() res: Response,
   ) {
     const isAjax =
@@ -41,110 +42,15 @@ export class UserController {
       request.headers['x-requested-with'] === 'XMLHttpRequest';
 
     if (isAjax) {
-      // Parse the flattened DataTables query parameters
-      const parsedQuery = this.parseDataTablesQuery(query);
-      console.log(
-        'Parsed DataTables query:',
-        JSON.stringify(parsedQuery, null, 2),
-      );
+      const result = await this.userService.find(query);
 
-      const { start, length, search, order, columns, draw, path } = parsedQuery;
-
-      // Calculate page number
-      const page =
-        start && length ? Math.floor(Number(start) / Number(length)) + 1 : 1;
-      const limit = length ? Number(length) : 10;
-
-      // Build sortBy array
-      const sortBy: [string, 'ASC' | 'DESC'][] = [];
-      if (order && columns) {
-        order.forEach((ord: any) => {
-          const colIdx = ord.column;
-          const colName = columns[colIdx]?.data;
-          const dir =
-            ord.dir && ord.dir.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-          if (colName && colName !== '') sortBy.push([colName, dir]);
-        });
-      }
-
-      // Global search
-      const searchValue = search?.value || '';
-
-      console.log('Final parsed values:', {
-        page,
-        limit,
-        sortBy,
-        searchValue,
-      });
-
-      // Build paginate query
-      const paginateQuery: PaginateQuery = {
-        path,
-        page,
-        limit,
-        sortBy,
-        search: searchValue,
-        filter: {},
-      };
-
-      const result = await this.userService.find(paginateQuery);
-
-      const data = {
-        draw: draw ? Number(draw) : 1,
-        recordsTotal: result.meta.totalItems,
-        recordsFiltered: result.meta.totalItems,
-        data: result.data,
-      };
-      return res.json(data);
+      return res.json(result);
     }
     return res.render('user/index', {
       title: 'User List',
       page_title: 'User DataTable',
       folder: 'User',
     });
-  }
-
-  private parseDataTablesQuery(query: any) {
-    const parsed = {
-      path: query.path,
-      draw: query.draw,
-      start: query.start,
-      length: query.length,
-      search: {
-        value: query['search[value]'] || '',
-        regex: query['search[regex]'] === 'true',
-      },
-      order: [] as any[],
-      columns: [] as any[],
-    };
-
-    // Parse columns
-    let columnIndex = 0;
-    while (query[`columns[${columnIndex}][data]`] !== undefined) {
-      parsed.columns[columnIndex] = {
-        data: query[`columns[${columnIndex}][data]`] || '',
-        name: query[`columns[${columnIndex}][name]`] || '',
-        searchable: query[`columns[${columnIndex}][searchable]`] === 'true',
-        orderable: query[`columns[${columnIndex}][orderable]`] === 'true',
-        search: {
-          value: query[`columns[${columnIndex}][search][value]`] || '',
-          regex: query[`columns[${columnIndex}][search][regex]`] === 'true',
-        },
-      };
-      columnIndex++;
-    }
-
-    // Parse order
-    let orderIndex = 0;
-    while (query[`order[${orderIndex}][column]`] !== undefined) {
-      parsed.order[orderIndex] = {
-        column: parseInt(query[`order[${orderIndex}][column]`]),
-        dir: query[`order[${orderIndex}][dir]`] || 'asc',
-      };
-      orderIndex++;
-    }
-
-    return parsed;
   }
 
   @Get('/create')
@@ -207,16 +113,6 @@ export class UserController {
     @Res() res: Response,
   ) {
     try {
-      const errors: Array<object> = [];
-      if (body.name === '') {
-        errors.push({ name: 'Name should not be empty' });
-      }
-      if (body.email === '') {
-        errors.push({ email: 'Email should not be empty' });
-      }
-      if (body.phoneNumber === '') {
-        errors.push({ phoneNumber: 'Phone Number should not be empty' });
-      }
       const user = await this.userService.update(parseInt(id), {
         name: body.name,
         email: body.email,

@@ -1,4 +1,13 @@
-import { IsString, IsEmail, IsPhoneNumber, IsOptional, Min, Max } from 'class-validator';
+import {
+  IsDateString,
+  IsEmail,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
+
 export class UpdateUserDto {
   @IsString()
   @IsOptional()
@@ -11,4 +20,16 @@ export class UpdateUserDto {
   @IsPhoneNumber()
   @IsOptional()
   phoneNumber: string;
+
+  @IsString()
+  @IsOptional()
+  language: string;
+
+  @IsDateString()
+  @IsOptional()
+  dob: Date;
+
+  @IsString()
+  @IsOptional()
+  gender: 'male' | 'female';
 }

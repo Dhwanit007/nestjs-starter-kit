@@ -10,10 +10,11 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+
 import { AuthService } from '../../auth.service';
 import { LoginDto } from '../../dto/request/login.dto';
-import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller()
 export class LoginController {
@@ -64,15 +65,27 @@ export class LoginController {
         email: body.email,
         password: body.password,
       },
-      message: [],
+      message: res.locals.toast,
       error: ['Invalid email or password'],
     });
   }
 
   @Post('logout')
   @UseGuards(AuthGuard)
-  logout(@Session() session, @Res() res: Response) {
+  logout(@Session() session, @Res() res: Response, @Req() req: Request) {
     session.userId = null;
+    req.flash('toast', 'Logout Successful');
     return res.redirect('/login');
   }
+
+  // @Post('logout')
+  // @UseGuards(AuthGuard)
+  // logout(@Session() session, @Res() res: Response, @Req() req: Request) {
+  //   session.userId = null;
+  //   req.flash('toast', 'Logout Successful');
+
+  //   session.save(() => {
+  //     return res.redirect('/login');
+  //   });
+  // }
 }

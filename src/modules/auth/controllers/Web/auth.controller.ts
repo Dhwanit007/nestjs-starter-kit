@@ -1,20 +1,21 @@
 import {
-  Controller,
-  Post,
-  Get,
-  Body,
   BadRequestException,
-  UseGuards,
-  Session,
+  Body,
+  Controller,
+  Get,
+  Post,
   Res,
+  Session,
+  UseGuards,
 } from '@nestjs/common';
-import { LoginDto } from '../../dto/request/login.dto';
-import { AuthService } from '../../auth.service';
-import { RegisterDto } from '../../dto/request/register.dto';
-import { User } from '../../../user/user.entity';
-import { CurrentUser } from '../../../user/decorators/current-user.decorator';
-import { AuthGuard } from '../../../../guards/auth.guard';
 import { Response } from 'express';
+
+import { AuthGuard } from '../../../../common/guards/auth.guard';
+import { CurrentUser } from '../../../user/decorators/current-user.decorator';
+import { User } from '../../../user/user.entity';
+import { AuthService } from '../../auth.service';
+import { LoginDto } from '../../dto/request/login.dto';
+import { RegisterDto } from '../../dto/request/register.dto';
 
 @Controller('auth')
 export class AuthController {
