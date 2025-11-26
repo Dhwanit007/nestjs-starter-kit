@@ -10,13 +10,14 @@ import { REQUEST } from '@nestjs/core';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { randomUUID } from 'crypto';
+import { Request } from 'express';
 
+import { FormValidationException } from '../filters/custom-validation.exception';
 import { ValidationError } from '../interfaces/api-response.interface';
 import { ResponseUtil } from '../utils/response.util';
 
 @Injectable({ scope: Scope.REQUEST })
 export class CustomValidationPipe implements PipeTransform<any> {
-  // Inject the request object in the constructor
   constructor(@Inject(REQUEST) private readonly request: Request) {}
 
   async transform(value: any, { metatype }: ArgumentMetadata) {
@@ -24,53 +25,44 @@ export class CustomValidationPipe implements PipeTransform<any> {
       return value;
     }
 
-    // Skip validation if value is already an instance of the metatype (e.g., from decorators)
-    if (value && value.constructor === metatype) {
-      return value;
-    }
-
-    // Skip validation if value is undefined or null (e.g., from custom decorators)
-    if (value === undefined || value === null) {
-      return value;
-    }
+    if (value && value.constructor === metatype) return value;
+    if (value === undefined || value === null) return value;
 
     const object = plainToInstance(metatype, value);
     const errors = await validate(object);
 
     if (errors.length > 0) {
-      const requestId = randomUUID();
-
-      // Format validation errors consistently
-      let formattedErrors: ValidationError[] | Record<string, string[]>;
+      // Format errors
+      const formattedErrors: Record<string, string[]> = {};
+      errors.forEach((err) => {
+        formattedErrors[err.property] = Object.values(err.constraints || {});
+      });
 
       const isApi = this.request.url.startsWith('/api');
+
+      console.log(formattedErrors, 'formatted');
+      console.log(errors, 'errors');
       if (isApi) {
-        formattedErrors = errors.map((err) => ({
-          field: err.property,
-          errors: Object.values(err.constraints || {}),
-        }));
+        // For API -> throw JSON error
+        throw new BadRequestException({
+          requestId: randomUUID(),
+          result: false,
+          statusCode: 400,
+          message: 'Validation failed',
+          payload: formattedErrors,
+        });
       } else {
-        formattedErrors = errors.reduce(
-          (acc, err) => {
-            acc[err.property] = Object.values(err.constraints || {});
-            return acc;
-          },
-          {} as Record<string, string[]>,
-        );
+        // For HTML -> store errors and old inputs in flash
+        this.request.flash('error', formattedErrors);
+        this.request.flash('oldInput', this.request.body);
+
+        const referer = this.request.get('Referer') || '/';
+        if (!this.request.res?.headersSent) {
+          this.request.res?.redirect(referer);
+        }
+        throw new FormValidationException();
+        return; // stop further processing
       }
-
-      // Get the first error message
-      const firstErrorMessage =
-        formattedErrors[0]?.errors[0] || 'Validation failed';
-
-      // Create consistent error response
-      const errorResponse = ResponseUtil.validationError(
-        formattedErrors,
-        firstErrorMessage,
-        requestId,
-      );
-
-      throw new BadRequestException(errorResponse);
     }
 
     return value;

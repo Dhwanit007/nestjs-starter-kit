@@ -159,7 +159,7 @@ export class UserController {
       name: updateUserDto.name,
     };
     this.userService.update(parseInt(id), data);
-    req.flash('toast', 'User Edited');
+    req.flash('toast', 'User Edited Successfully');
     res.redirect('/users');
   }
 
@@ -170,7 +170,7 @@ export class UserController {
     @Res() res: Response,
   ) {
     await this.userService.remove(parseInt(id));
-    req.flash('toast', 'User Successfully Deleted');
+    req.flash('toast', 'User Deleted Successfully');
     res.redirect('/users');
   }
 }

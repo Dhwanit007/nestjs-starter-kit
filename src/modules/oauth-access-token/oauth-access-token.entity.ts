@@ -6,7 +6,7 @@ export class OAuthAccessToken {
   id: number;
 
   @Column()
-  userId: number;
+  userId: string;
 
   @Column()
   tokenId: string;

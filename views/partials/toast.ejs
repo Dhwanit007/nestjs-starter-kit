@@ -1,48 +1,79 @@
-<% if (locals.toast !="" ) { %>
+<!-- <% if (locals.toast !="" ) { %>
   <script>
     const toast = JSON.parse('<%- JSON.stringify(locals.toast) %>');
     const options = {
       error: {
-        gravity: "bottom",
-        position: "right",
         style: {
           background: "linear-gradient(to right, #ff5f6d, #ffc371)"
         },
       },
       success: {
-        gravity: "bottom",
-        position: "right",
         style: {
           background: "linear-gradient(to right, #56ab2f, #a8e063)"
         }
       }
     }
-    if (toast) {
-      let text = '';
-      let type = 'success';
+    if (toast.message) {
+      Toastify({
+        text: toast.message,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        ...options[toast.type]
+      }).showToast();
+    } else {
+      Toastify({
+        text: typeof toast[0] === 'string' ? toast[0] : toast[0].message,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        ...options.success,
+      }).showToast();
+    }
+    // }
 
-      // Handle both string and object
-      if (typeof toast === 'string') {
-        text = toast;
-      } else if (toast.message) {
-        text = toast.message;
-        type = toast.type || 'success';
-      } else if (Array.isArray(toast)) {
-        text = toast[0];
-      }
+  </script>
+  <% } %> -->
 
-      if (text.trim() !== '') {
-        Toastify({
-          text,
-          duration: 3000,
-          gravity: 'top',
-          position: 'right',
-          close: true,
-          backgroundColor:
-            type === 'error' ? '#f44336' : '#4caf50',
-        }).showToast();
+<% if (locals.toast && locals.toast.length> 0) { %>
+  <script>
+    // Get the first flash message
+    const toast = JSON.parse('<%- JSON.stringify(locals.toast[0]) %>');
+
+    // Define toast styles
+    const options = {
+      error: {
+        style: {
+          background: "linear-gradient(to right, #ff5f6d, #ffc371)"
+        }
+      },
+      success: {
+        style: {
+          background: "linear-gradient(to right, #56ab2f, #a8e063)"
+        }
       }
+    };
+
+    // Determine message text and type
+    let messageText = '';
+    let toastType = 'success'; // default
+
+    if (typeof toast === 'string') {
+      messageText = toast;
+    } else if (typeof toast === 'object' && toast !== null) {
+      messageText = toast.message || '';
+      toastType = toast.type || 'success';
     }
 
+    // Show toast
+    if (messageText) {
+      Toastify({
+        text: messageText,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        ...options[toastType],
+      }).showToast();
+    }
   </script>
   <% } %>

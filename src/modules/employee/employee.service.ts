@@ -27,30 +27,56 @@ export class EmployeeService {
     return `${salt}:${derivedKey.toString('hex')}`;
   }
 
+  async findByEmail(email: string) {
+    return this.emprepo.findOne({ where: { email } });
+  }
+
+  async getAllEmployeesWithDept(): Promise<Employee[]> {
+    return this.emprepo.find({
+      relations: ['department'], // <--- load department relation
+    });
+  }
+
   async getAllEmployees(query?: PaginateQuery): Promise<any> {
-    const qb = this.emprepo.createQueryBuilder('employee');
+    const qb = this.emprepo
+      .createQueryBuilder('employee')
+      .leftJoinAndSelect('employee.department', 'department'); // join department
 
     if (!query) {
       return qb.getMany();
     }
 
     return paginate(query, qb, {
-      sortableColumns: ['id', 'name', 'created_at', 'role', 'email'],
-      searchableColumns: ['name', 'email'],
-      defaultLimit: 5,
+      sortableColumns: [
+        'id',
+        'name',
+        'created_at',
+        'role',
+        'email',
+        'department.name',
+      ],
+      searchableColumns: ['name', 'email', 'department.name'], // optional
+      defaultLimit: 10,
     });
+  }
+
+  async countAll() {
+    return await this.emprepo.count();
   }
 
   async create(dto: CreateEmployeeDto) {
     const existing = await this.emprepo.findOne({
       where: { email: dto.email },
     });
+    // if (existing) {
+    //   throw new BadRequestException('Email already Exists');
+    // }
     if (existing) {
-      throw new BadRequestException('Email already Exists');
+      return null; // or false
     }
     // hash password
     const hashedPassword = await this.hashPassword(dto.password);
-    const employee = this.create({ ...dto, password: hashedPassword });
+    const employee = this.emprepo.create({ ...dto, password: hashedPassword });
     return await this.emprepo.save(employee);
   }
 
@@ -63,7 +89,7 @@ export class EmployeeService {
   }
 
   async remove(id: string) {
-    await this.emprepo.softDelete(id);
+    return await this.emprepo.softDelete(id);
   }
 
   async update(id: string, dto: UpdateEmployeeDto) {
@@ -71,6 +97,15 @@ export class EmployeeService {
     // console.log(user);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
+    }
+    const existing = await this.emprepo.findOne({
+      where: { email: dto.email },
+    });
+    // if (existing) {
+    //   throw new BadRequestException('Email already Exists');
+    // }
+    if (existing) {
+      return null; // or false
     }
     Object.assign(user, dto);
     return await this.emprepo.save(user);
@@ -92,6 +127,20 @@ export class EmployeeService {
     const employee = await this.emprepo.findOne({ where: { id } });
     if (!employee) throw new NotFoundException(`User with id ${id} not found`);
     return employee;
+  }
+
+  async assignDepartment(employeeId: string, deptId: string) {
+    const employee = await this.getById(employeeId);
+    if (!employee) throw new NotFoundException('Employee not found');
+
+    employee.department = { id: deptId } as any; // Set department reference
+    return this.emprepo.save(employee);
+  }
+
+  async getByIdSafe(id: string): Promise<{ id: string; name: string } | null> {
+    const employee = await this.emprepo.findOne({ where: { id } });
+    if (!employee) return null;
+    return { id: employee.id, name: employee.name };
   }
 
   async getById2(id: string) {

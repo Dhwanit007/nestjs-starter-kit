@@ -1,0 +1,60 @@
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+
+import { EmployeeService } from 'src/modules/employee/employee.service';
+import { CreateProjectDto } from '../dtos/create-project.dto';
+import { ProjectsService } from '../projects.service';
+
+@Controller('projects')
+export class ProjectsController {
+  constructor(
+    private employeeService: EmployeeService,
+    private projectService: ProjectsService,
+  ) {}
+  @Get()
+  async getProjects(@Req() req, @Res() res) {
+    return res.render('projects/projects', {
+      title: 'Projects',
+      page_title: 'Projects',
+      folder: 'Projetcs',
+      message: req.flash('toast'),
+      error: {},
+    });
+  }
+
+  @Get('create')
+  async createProject(@Req() req, @Res() res) {
+    const employeesPaginated = await this.employeeService.getAllEmployees({
+      page: 1,
+      limit: 100,
+      path: '/projects/create',
+    });
+
+    const employees = employeesPaginated.data;
+
+    return res.render('projects/create', {
+      title: 'Create Project',
+      page_title: 'Create Project',
+      folder: 'Projects',
+      message: req.flash('toast'),
+      employees,
+    });
+  }
+  
+  @Post('create')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async create(@Body() dto: CreateProjectDto, @Req() req, @Res() res) {
+    // console.log(dto);
+    await this.projectService.createProject(dto);
+    req.flash('toast', 'Project Created Successfully');
+    return res.redirect('/projects');
+  }
+}

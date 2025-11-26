@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -12,13 +13,14 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { error } from 'console';
 import type { PaginateQuery, Paginated } from 'nestjs-paginate';
 import { Paginate } from 'nestjs-paginate';
 import { title } from 'process';
 
-import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { EmployeeService } from './employee.service';
-import { Employee } from './entities/employee.entity';
+import { CreateEmployeeDto } from '../dto/create-employee.dto';
+import { EmployeeService } from '../employee.service';
+import { Employee } from '../entities/employee.entity';
 
 @Controller('employee')
 export class EmployeeController {
@@ -31,7 +33,7 @@ export class EmployeeController {
     @Paginate() query: PaginateQuery,
   ) {
     const employees = await this.employeeservice.getAllEmployees(query); // we’ll add this
-    return res.render('user/employees', {
+    return res.render('employees/index', {
       title: 'Employees',
       user: req.user,
       employees,
@@ -39,6 +41,12 @@ export class EmployeeController {
       folder: 'Employee',
       message: req.flash('toast'),
     });
+  }
+
+  @Get('all')
+  async getAllEmployeesRaw(@Res() res) {
+    const employees = await this.employeeservice.getallEmployees();
+    return res.json({ data: employees });
   }
 
   @Get('newall')
@@ -58,7 +66,7 @@ export class EmployeeController {
 
   @Patch('restore/:id')
   async restoreEmployee(@Param('id') id: string, @Res() res) {
-    console.log(id)
+    console.log(id);
     const restored = await this.employeeservice.restore(id);
     if (!restored) {
       throw new HttpException(
@@ -91,19 +99,61 @@ export class EmployeeController {
   }
 
   // Create employee using
+  // @Post('create')
+  // @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  // async create(@Body() dto: CreateEmployeeDto, @Req() req, @Res() res) {
+  //   const existing = await this.employeeservice.findByEmail(dto.email);
+  //   if (existing) {
+  //     req.flash('toast', { type: 'error', message: 'Email already exists' });
+  //     req.flash('oldInput', dto);
+  //     // console.log(req.flash('oldInput', res.body));
+  //     res.redirect('/employee/create');
+  //   }
+  //   await this.employeeservice.create(dto);
+  //   req.flash('toast', 'Employee Created Successfully');
+  //   return res.redirect('/employee');
+  // }
+
   @Post('create')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateEmployeeDto, @Req() req, @Res() res) {
+    // First, check if email exists
+    const existing = await this.employeeservice.findByEmail(dto.email);
+    if (existing) {
+      req.flash('toast', { type: 'error', message: 'Email already exists' });
+      return res.redirect('/employee/create');
+    }
+    // If email doesn't exist, create employee
     await this.employeeservice.create(dto);
-    req.flash('toast', 'Employee Created Successfully');
+    req.flash('toast', {
+      type: 'success',
+      message: 'Employee Created Successfully',
+    });
     return res.redirect('/employee');
-    // return { success: true, message: 'Employee created successfully' };
+  }
+
+  @Post('register')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async createpage(@Body() dto: CreateEmployeeDto, @Req() req, @Res() res) {
+    // First, check if email exists
+    const existing = await this.employeeservice.findByEmail(dto.email);
+    if (existing) {
+      req.flash('toast', { type: 'error', message: 'Email already exists' });
+      return res.redirect('/register');
+    }
+    // If email doesn't exist, create employee
+    await this.employeeservice.create(dto);
+    req.flash('toast', {
+      type: 'success',
+      message: 'Employee Created Successfully',
+    });
+    return res.redirect('/login');
   }
 
   // Get register page
   @Get('create')
   async getCreateEmployeePage(@Req() req, @Res() res) {
-    return res.render('user/register', {
+    return res.render('employees/register', {
       title: 'Create Employee',
       user: req.user,
       page_title: 'Create Employee',
@@ -116,7 +166,7 @@ export class EmployeeController {
   @Post('delete/:id')
   async deleteEmployee(@Param('id') id: string, @Res() res, @Req() req) {
     await this.employeeservice.remove(id);
-    req.flash('toast', 'Employee deleted successfully');
+    req.flash('toast', 'Employee Deleted Successfully');
     return res.redirect('/employee');
   }
 
@@ -124,7 +174,7 @@ export class EmployeeController {
   @Post('update/:id')
   async updateEmployee(@Param('id') id: string, @Req() req, @Res() res) {
     await this.employeeservice.update(id, req.body);
-    req.flash('toast', 'Employee updated successfully');
+    req.flash('toast', 'Employee Updated Successfully');
     return res.redirect('/employee');
   }
 

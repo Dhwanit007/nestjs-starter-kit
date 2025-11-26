@@ -1,0 +1,42 @@
+<% if (typeof error !=='undefined' && error.length> 0) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const errors = JSON.parse('<%- JSON.stringify(error) %>')[0];
+
+            function displayError(inputElement, errorMsg) {
+                let errElement = inputElement.nextElementSibling;
+                if (!errElement || errElement.id != `errorMsg-${inputElement.name}`) {
+                    errElement = document.createElement('span');
+                    errElement.classList.add("text-danger");
+                    errElement.id = `errorMsg-${inputElement.name}`;
+                    errElement.innerText = errorMsg;
+                    inputElement.classList.add('is-invalid');
+                    inputElement.insertAdjacentElement("afterend", errElement);
+                } else {
+                    errElement.innerText = errorMsg;
+                }
+            }
+
+            for (const err in errors) {
+                const inputElement = document.getElementById(err);
+                if (inputElement) {
+                    errors[err].forEach(error => displayError(inputElement, error.replace(/^./, c => c.toUpperCase())));
+                }
+            }
+        });
+    </script>
+    <% } %>
+
+        <% if (typeof oldInput !=='undefined' && oldInput.length> 0) { %>
+            <script>
+                const oldInputs = JSON.parse('<%- JSON.stringify(oldInput) %>')[0];
+
+                for (const input in oldInputs) {
+                    if (input === 'password') continue;
+                    const inputElement = document.getElementById(input);
+                    if (inputElement) inputElement.value = oldInputs[input];
+                }
+
+                document.currentScript.remove();
+            </script>
+            <% } %>

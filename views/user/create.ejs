@@ -19,7 +19,7 @@
                         <div class="mb-3">
                           <label for="nameinput" class="form-label">Name</label>
                           <input type="text" class="form-control" name="name" value="<%- old ? old.name : '' %>"
-                            placeholder="Enter your name" id="nameinput" required>
+                            placeholder="Enter your name" id="name" required>
                           <% if (errors && errors.name) { %>
                             <div class="text-danger">
                               <%= errors.name[0] %>
@@ -33,7 +33,7 @@
                       <div class="mb-3">
                         <label for="phonenumberInput" class="form-label">Phone Number</label>
                         <input type="tel" class="form-control" name="phoneNumber"
-                          value="<%- old ? old.phoneNumber : '' %>" placeholder="+(245) 451 45123" id="phonenumberInput"
+                          value="<%- old ? old.phoneNumber : '' %>" placeholder="+(245) 451 45123" id="phoneNumber"
                           required>
                         <% if (errors && errors.phoneNumber) { %>
                           <div class="text-danger">
@@ -46,7 +46,7 @@
                         <div class="mb-3">
                           <label for="emailidInput" class="form-label">Email Address</label>
                           <input type="email" class="form-control" name="email" value="<%- old ? old.email : '' %>"
-                            placeholder="example@gamil.com" id="emailidInput" required>
+                            placeholder="example@gamil.com" id="email" required>
                           <% if (errors && errors.email) { %>
                             <div class="text-danger">
                               <%= errors.email[0] %>
@@ -59,7 +59,7 @@
                         <div class="mb-3">
                           <label for="passwordInput" class="form-label">Password</label>
                           <input type="password" class="form-control" name="password"
-                            value="<%- old ? old.password : '' %>" placeholder="Enter your password" id="emailidInput"
+                            value="<%- old ? old.password : '' %>" placeholder="Enter your password" id="password"
                             required>
                           <% if (errors && errors.password) { %>
                             <div class="text-danger">
@@ -91,4 +91,4 @@
         <%- contentFor('FooterJs') %>
 
 
-          <script src="/assets/js/global-form-validate.js"> </script>
+          <!-- <script src="/assets/js/global-form-validate.js"> </script> -->

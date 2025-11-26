@@ -13,10 +13,6 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Employees</h5>
                         <div class="d-flex gap-2">
-                            <!-- <button class="btn btn-primary add-btn" data-bs-toggle="modal"
-                                data-bs-target="#addEmployeeModal">
-                                Add Employee
-                            </button> -->
                             <a href="/employee/create" class="btn btn-primary">Add Employee</a>
                             <button id="deleteSelectedBtn" class="btn btn-danger">Delete Selected</button>
                         </div>
@@ -38,6 +34,7 @@
                                     <th>Email</th>
                                     <th class="no-sort">Role</th>
                                     <th class="no-sort">Created At</th>
+                                    <th class="no-sort">Department</th>
                                     <th class="no-sort">Actions</th>
                                 </tr>
                             </thead>
@@ -77,7 +74,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
                             <button class="btn btn-primary" type="submit">Update</button>
                         </div>
                     </form>
@@ -95,7 +92,8 @@
                             id="deleteConfirmationModal-close"></button>
                     </div>
 
-                    <form id="delete-form" method="POST">
+                    <form id="delete-form" action="" method="POST" data-form-type="Delete ">
+                        <input type="hidden" name="_method" value="DELETE">
                         <div class="modal-body">
                             <div class="mt-2 text-center">
                                 <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
@@ -113,7 +111,8 @@
 
                             <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
                                 <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn w-sm btn-danger" id="delete-confirmation">Yes, Delete
+                                <button type="submit" class="btn w-sm btn-danger" data-bs-dismiss="modal"
+                                    id="delete-confirmation">Yes, Delete
                                     It!</button>
                             </div>
                         </div>
@@ -187,154 +186,5 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 
-            <script src="/assets/js/global-form-validate.js"> </script>
-            <script>
-                let table;
-
-                $(document).ready(function () {
-
-                    table = $('#employeesTable').DataTable({
-                        serverSide: true,
-                        processing: true,
-
-                        ajax: {
-                            url: '/employee/newall',
-                            data: function (data) {
-                                const params = {
-                                    search: data.search.value,
-                                    limit: data.length,
-                                    page: Math.ceil((data.start + 1) / data.length),
-                                };
-
-                                if (data.order.length > 0) {
-                                    const order = data.order[0];
-                                    let columnName = data.columns[order.column].data;
-                                    params.sortBy = `${columnName}:${order.dir.toUpperCase()}`;
-                                }
-
-                                return params;
-                            }
-                        },
-
-                        // 🔥 Disable sorting for no-sort columns
-                        columnDefs: [
-                            { targets: "no-sort", orderable: false }
-                        ],
-
-                        columns: [
-                            {
-                                orderable: false,
-                                data: null,
-                                render: row => `<input type="checkbox" class="row-checkbox" value="${row.id}">`
-                            },
-                            {
-                                orderable: false,
-                                data: null,
-                                render: (data, type, row, meta) =>
-                                    meta.row + 1 + meta.settings._iDisplayStart
-                            },
-                            { data: 'id' },
-                            { data: 'name' },
-                            {
-                                data: 'email', render: function (email) {
-                                    return `<span class="badge bg-info text-dark">${email}</span>`
-                                }
-                            },
-                            { data: 'role' },
-                            {
-                                data: 'created_at',
-                                render: data => new Date(data).toDateString()
-                            },
-                            {
-                                data: null,
-                                render: function (data) {
-                                    return `
-                            <button class="btn btn-sm btn-primary edit-btn"
-                                data-id="${data.id}"
-                                data-name="${data.name}"
-                                data-email="${data.email}">
-                                Edit
-                            </button>
-
-                            <button class="btn btn-sm btn-danger delete-btn"
-                                data-id="${data.id}">
-                                Delete
-                            </button>`;
-                                }
-                            }
-                        ]
-                    });
-
-                    // SELECT ALL
-                    $('#selectAll').on('change', function () {
-                        $('.row-checkbox').prop('checked', $(this).is(':checked'));
-                    });
-
-                    // DELETE SINGLE
-                    $('#employeesTable').on('click', '.delete-btn', function () {
-                        $('#modal-row-id').val($(this).data('id'));
-                        $('#deleteConfirmationModal').modal('show');
-                    });
-
-                    // Add Employee Form logic to submit
-                    $(document).on('click', '.add-btn', function () {
-                        $('#addEmployeeModal').modal('show')
-                    })
-
-                    // OPEN EDIT MODAL
-                    $(document).on('click', '.edit-btn', function () {
-
-                        const id = $(this).data('id');
-                        const name = $(this).data('name');
-                        const email = $(this).data('email');
-
-                        $('#edit-id').val(id);
-                        $('#edit-name').val(name);
-                        $('#edit-email').val(email);
-
-                        // Set form action dynamically ✔
-                        $('#editEmployeeForm').attr('action', `/employee/update/${id}`);
-
-                        $('#editEmployeeModal').modal('show');
-                    });
-
-                    // CONFIRM DELETE
-                    $('#delete-confirmation').on('click', function (e) {
-                        e.preventDefault();
-                        const id = $('#modal-row-id').val();
-                        $.ajax({
-                            url: `/employee/delete/${id}`,
-                            type: 'POST',
-                            success: function () {
-                                $('#deleteConfirmationModal').modal('hide');
-                                table.ajax.reload();
-                            }
-                        });
-                    });
-
-                    // MULTIPLE DELETE
-                    $('#deleteSelectedBtn').click(function () {
-                        const ids = $('.row-checkbox:checked').map(function () {
-                            return this.value;
-                        }).get();
-
-                        if (ids.length === 0) {
-                            alert("Please select at least one employee.");
-                            return;
-                        }
-
-                        if (!confirm(`Delete ${ids.length} employee(s)?`)) return;
-
-                        $.ajax({
-                            url: '/employee/delete-multiple',
-                            method: 'POST',
-                            data: JSON.stringify({ ids }),
-                            contentType: 'application/json',
-                            success: function () {
-                                table.ajax.reload();
-                                $('#selectAll').prop('checked', false);
-                            }
-                        });
-                    });
-                });
-            </script>
+            <!-- <script src="/assets/js/global-form-validate.js"> </script> -->
+            <script src="/assets/js/employees/index.js"></script>

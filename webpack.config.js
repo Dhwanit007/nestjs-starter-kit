@@ -117,7 +117,7 @@ module.exports = {
                                     const rtlCss = rtlcss.process(ltrCss, { autoRename: false, clean: false });
                                     compilation.emitAsset(pair.rtl, new RawSource(rtlCss)); // Use emitAsset to add the asset
                                 } else {
-                                    console.error(`Asset ${pair.ltr} is undefined.`);
+                                    // console.error(`Asset ${pair.ltr} is undefined.`);
                                 }
                             });
                         }
@@ -146,11 +146,11 @@ module.exports = {
                                 await fs.promises.access(sourcePath, fs.constants.F_OK);
                                 await fs.copy(sourcePath, destPackagePath);
                             } catch (error) {
-                                console.error(`Package ${packageName} does not exist.`);
+                                // console.error(`Package ${packageName} does not exist.`);
                             }
                         }
                     } catch (error) {
-                        console.error('Error copying and renaming packages:', error);
+                        // console.error('Error copying and renaming packages:', error);
                     }
                 });
             },

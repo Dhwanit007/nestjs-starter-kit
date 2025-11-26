@@ -14,9 +14,7 @@ import { Logger } from 'winston';
 
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { ViewLocalsMiddleware } from './common/middlewares/view-locals.middleware';
 import { AppModule } from './modules/app/app.module';
-import { TodosService } from './modules/todos/todos.service';
 import { log } from './utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -35,13 +33,6 @@ async function bootstrap() {
 
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
-
-  const todosService = app.get(TodosService);
-
-  app.use((req, res, next) => {
-    res.locals.todos = todosService.findAll();
-    next();
-  });
 
   // Set up view engine
   app.useStaticAssets(join(__dirname, '..', 'public'));
@@ -64,7 +55,7 @@ async function bootstrap() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   app.use(flash());
 
-  app.use(new ViewLocalsMiddleware().use);
+  // app.use(new ViewLocalsMiddleware().use);
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   (global as any).log = log;
@@ -82,6 +73,6 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalInterceptors(new ResponseInterceptor());
 
-  await app.listen(process.env.PORT ?? 9000);
+  await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();

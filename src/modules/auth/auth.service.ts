@@ -3,142 +3,140 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserService } from '../user/user.service';
-import { randomBytes, scrypt as _scrypt, randomUUID } from 'crypto';
-import { promisify } from 'util';
-import { RegisterDto } from './dto/request/register.dto';
-import { User } from '../user/user.entity';
-import { JwtService } from '@nestjs/jwt';
-import { OauthAccessTokenService } from '../oauth-access-token/oauth-access-token.service';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { scrypt as _scrypt, randomBytes, randomUUID } from 'crypto';
 import { Request } from 'express';
+import { promisify } from 'util';
+
+import { CreateEmployeeDto } from '../employee/dto/create-employee.dto';
+import { EmployeeService } from '../employee/employee.service';
+import { Employee } from '../employee/entities/employee.entity';
+import { OauthAccessTokenService } from '../oauth-access-token/oauth-access-token.service';
+import { User } from '../user/user.entity';
+import { RegisterDto } from './dto/request/register.dto';
 
 const scrypt = promisify(_scrypt);
+
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
-    private jwtService: JwtService,
-    private oauthAccessTokenService: OauthAccessTokenService,
-    private configService: ConfigService,
+    private readonly empService: EmployeeService,
+    private readonly jwtService: JwtService,
+    private readonly oauthAccessTokenService: OauthAccessTokenService,
+    private readonly configService: ConfigService,
   ) {}
 
+  /* ----------------------- LOGIN ----------------------- */
   async login(email: string, password: string) {
-    const user: Promise<User | null> = this.validateUser(email, password);
-    if (user === null) throw new UnauthorizedException();
+    const user = await this.validateUser(email, password);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
     return user;
   }
 
-  async register(body: RegisterDto) {
-    const user = await this.userService.findOneByEmail(body.email);
-
-    if (user)
+  /* ----------------------- REGISTER ----------------------- */
+  async register(body: CreateEmployeeDto) {
+    // Check employee exists
+    const existing = await this.empService.findByEmail(body.email);
+    if (existing) {
       throw new BadRequestException('User already exists, please login');
+    }
 
+    // Hash password
     const salt = randomBytes(8).toString('hex');
     const hash = ((await scrypt(body.password, salt, 32)) as Buffer).toString(
       'hex',
     );
-    body.password = `${salt}.${hash}`;
+    body.password = `${salt}:${hash}`;
 
-    const newUser = await this.userService.create(body);
-    newUser.accessToken = await this.generateAccessToken(newUser);
+    // Create employee using EmployeeService
+    const newUser = await this.empService.create(body);
+
+    // Generate token
+    // newUser.accessToken = await this.generateAccessToken(newUser);
+
     return newUser;
   }
 
-  async generateAccessToken(user: User) {
+  /* ----------------------- ACCESS TOKEN ----------------------- */
+  async generateAccessToken(user: Employee) {
     const payload = {
       sub: user.id,
       tokenId: randomUUID(),
     };
+
     const accessToken = this.jwtService.sign(payload);
+
     const expiresInConfig = this.configService.get<string>(
       'passport.signOptions.expiresIn',
       '180d',
     );
-    const expiresInStr = expiresInConfig ?? '180d';
+
     await this.oauthAccessTokenService.createAccessToken({
       userId: user.id,
       tokenId: payload.tokenId,
-      expiresAt: new Date(Date.now() + this.parseExpiresIn(expiresInStr)),
+      expiresAt: new Date(Date.now() + this.parseExpiresIn(expiresInConfig)),
     });
+
     return accessToken;
   }
-  revokeToken(req: Request) {
-    console.log(
-      this.configService.get<string>('passport.secret', 'defaultSecret'),
-    );
-    // Extract token string from Authorization header
-    const authHeader = req.headers['authorization'] || '';
+
+  /* ----------------------- LOGOUT ----------------------- */
+  async revokeToken(req: Request) {
+    const authHeader = req.headers.authorization || '';
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-    if (!token) {
-      throw new Error('No access token found in request');
+
+    if (!token) throw new Error('No access token provided');
+
+    const decoded = this.jwtService.decode(token) as any;
+
+    if (!decoded || !decoded.tokenId) {
+      throw new Error('Invalid token');
     }
 
-    const validateJwtPayload = (payload: unknown) => {
-      if (
-        typeof payload === 'object' &&
-        payload !== null &&
-        'tokenId' in payload &&
-        typeof payload['tokenId'] === 'string' &&
-        'sub' in payload &&
-        typeof payload['sub'] === 'number'
-      ) {
-        return {
-          sub: payload['sub'],
-          tokenId: payload['tokenId'],
-          iat: payload['iat'] as number | undefined,
-          exp: payload['exp'] as number | undefined,
-        };
-      }
-      throw new Error('Invalid JWT payload');
-    };
-
-    const decodeJwt = (token: string): Record<string, unknown> => {
-      const decoded = this.jwtService.decode(token);
-
-      if (!decoded || typeof decoded !== 'object') {
-        throw new Error('Failed to decode JWT');
-      }
-
-      return decoded as Record<string, unknown>;
-    };
-
-    const payload = decodeJwt(token);
-    const jwtPayload = validateJwtPayload(payload);
-
-    if (!req.user || typeof req.user.id !== 'number') {
-      throw new Error('Invalid user information in request');
-    }
     return this.oauthAccessTokenService.revokeAccessToken(
-      req.user.id,
-      jwtPayload.tokenId,
+      decoded.sub,
+      decoded.tokenId,
     );
   }
-  async validateToken(user: User, tokenId: string): Promise<boolean> {
+
+  /* ----------------------- TOKEN VALIDATION ----------------------- */
+  async validateToken(user: Employee, tokenId: string): Promise<boolean> {
     const token = await this.oauthAccessTokenService.getUserToken(
       user.id,
       tokenId,
     );
-    if (token) {
-      if (!(token.revoked || token.expiresAt < new Date())) return true;
-    }
-    return false;
+
+    if (!token) return false;
+
+    return !(token.revoked || token.expiresAt < new Date());
   }
 
-  public async validateUser(email: string, password: string) {
-    const user = await this.userService.findOneByEmail(email);
+  /* ----------------------- USER VALIDATION (LOGIN) ----------------------- */
+  async validateUser(email: string, password: string) {
+    const user = await this.empService.findByEmail(email);
     if (!user) return null;
-    const [salt, storedHash] = user.password.split('.');
+
+    const [salt, storedHash] = user.password.split(':'); // FIXED
+
     const hash = (await scrypt(password, salt, 32)) as Buffer;
+
     if (hash.toString('hex') !== storedHash) return null;
+
     return user;
   }
 
+  /* ----------------------- EXPIRES-IN PARSER ----------------------- */
   private parseExpiresIn(expiresIn: string): number {
     const match = expiresIn.match(/^(\d+)([smhd])$/);
     if (!match) return 180 * 24 * 60 * 60 * 1000;
+
     const value = parseInt(match[1], 10);
+
     switch (match[2]) {
       case 's':
         return value * 1000;

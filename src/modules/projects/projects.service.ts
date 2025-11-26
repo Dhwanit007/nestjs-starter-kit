@@ -20,9 +20,48 @@ export class ProjectsService {
     return this.projectsRepository.save(project);
   }
 
-  //   async findAllProjects(): Promise<Projects[]> {
-  //     return this.projectsRepository.find();
+  async getall(): Promise<Projects[]> {
+    const projects = this.projectsRepository.find();
+    if (!projects) {
+      throw new NotFoundException();
+    }
+    return projects;
+  }
+
+  // async findAllProjects() {
+  //   const projects = await this.projectsRepository.find();
+
+  //   const result: any = [];
+
+  //   for (const project of projects) {
+  //     //   let employees: any = [];
+
+  //     //   if (Array.isArray(project.assignedEmployeeIds)) {
+  //     //     employees = await Promise.all(
+  //     //       project.assignedEmployeeIds.map(async (empId) => {
+  //     //         const emp = await this.employeeService.getById(empId);
+  //     //         return emp ? { id: emp.id, name: emp.name } : null;
+  //     //       }),
+  //     //     );
+
+  //     //     employees = employees.filter(Boolean);
+  //     //   }
+
+  //     const ids = Array.isArray(project.assignedEmployeeIds)
+  //       ? project.assignedEmployeeIds
+  //       : [project.assignedEmployeeIds]; // normalize
+
+  //     const employees = await Promise.all(
+  //       ids.map((id) => this.employeeService.getById(id)),
+  //     );
+
+  //     result.push({
+  //       ...project,
+  //       assignedEmployees: employees,
+  //     });
   //   }
+  //   return result;
+  // }
 
   async findAllProjects() {
     const projects = await this.projectsRepository.find();
@@ -30,33 +69,35 @@ export class ProjectsService {
     const result: any = [];
 
     for (const project of projects) {
-      //   let employees: any = [];
-
-      //   if (Array.isArray(project.assignedEmployeeIds)) {
-      //     employees = await Promise.all(
-      //       project.assignedEmployeeIds.map(async (empId) => {
-      //         const emp = await this.employeeService.getById(empId);
-      //         return emp ? { id: emp.id, name: emp.name } : null;
-      //       }),
-      //     );
-
-      //     employees = employees.filter(Boolean);
-      //   }
-
       const ids = Array.isArray(project.assignedEmployeeIds)
         ? project.assignedEmployeeIds
-        : [project.assignedEmployeeIds]; // normalize
+        : project.assignedEmployeeIds
+          ? [project.assignedEmployeeIds]
+          : [];
 
       const employees = await Promise.all(
-        ids.map((id) => this.employeeService.getById(id)),
+        ids.map(async (id) => {
+          try {
+            const emp = await this.employeeService.getById(id);
+            return { id: emp.id, name: emp.name };
+          } catch (err) {
+            // Ignore missing employees
+            return null;
+          }
+        }),
       );
 
       result.push({
         ...project,
-        assignedEmployees: employees,
+        assignedEmployees: employees.filter(Boolean), // remove nulls
       });
     }
+
     return result;
+  }
+
+  async countAll() {
+    return await this.projectsRepository.count();
   }
 
   async getProjectById(id: string): Promise<Projects> {
@@ -75,9 +116,26 @@ export class ProjectsService {
     return { message: 'Project Deleted Successfully' };
   }
 
+  // async updateProject(id: string, dto: UpdateProjectDto): Promise<Projects> {
+  //   const project = await this.getProjectById(id);
+  //   Object.assign(project, dto);
+  //   return this.projectsRepository.save(project);
+  // }
+
   async updateProject(id: string, dto: UpdateProjectDto): Promise<Projects> {
     const project = await this.getProjectById(id);
-    Object.assign(project, dto);
+
+    // Update basic fields
+    if (dto.name !== undefined) project.name = dto.name;
+    if (dto.description !== undefined) project.description = dto.description;
+
+    // VERY IMPORTANT: Update employee IDs array properly
+    if (dto.assignedEmployeeIds !== undefined) {
+      project.assignedEmployeeIds = Array.isArray(dto.assignedEmployeeIds)
+        ? dto.assignedEmployeeIds
+        : [dto.assignedEmployeeIds];
+    }
+
     return this.projectsRepository.save(project);
   }
 

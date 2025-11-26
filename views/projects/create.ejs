@@ -16,24 +16,28 @@
 
                     <!-- Form -->
                     <div class="card-body">
-                        <form action="/api/projects/create" method="POST">
+                        <form action="/projects/create" method="POST">
 
                             <!-- Project Name -->
                             <div class="mb-3">
                                 <label class="form-label">Project Name</label>
-                                <input type="text" name="name" class="form-control" value="">
+                                <input type="text" name="name" class="form-control" id="name" value=""
+                                    autocomplete="name">
                             </div>
+
 
                             <!-- Project Description -->
                             <div class="mb-3">
                                 <label class="form-label">Project Description</label>
-                                <textarea name="description" class="form-control" rows="3"></textarea>
+                                <textarea name="description" class="form-control" rows="3" id="description"
+                                    autocomplete="cc-name"></textarea>
                             </div>
 
                             <!-- Assigned Employees -->
                             <div class="mb-3">
                                 <label class="form-label">Assign Employees</label>
-                                <select name="assignedEmployeeIds" id="employeeSelect" class="form-control" multiple>
+                                <select name="assignedEmployeeIds" id="assignedEmployeeIds" autocomplete="name"
+                                    class="form-control" multiple>
                                     <% if (employees && employees.length) { %>
                                         <% employees.forEach(emp=> { %>
                                             <option value="<%= emp.id %>">
@@ -61,7 +65,7 @@
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
             <script>
-                $('#employeeSelect').select2({
+                $('#assignedEmployeeIds').select2({
                     placeholder: "Select employees",
                     allowClear: true,
                     width: '100%'

@@ -1,5 +1,7 @@
 <!doctype html>
-<html lang="en" data-layout="vertical" data-layout-style="detached" data-layout-position="fixed" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-layout-width="fluid" data-sidebar-image="none" data-preloader="disable">
+<html lang="en" data-layout="vertical" data-layout-style="detached" data-layout-position="fixed" data-topbar="light"
+  data-sidebar="dark" data-sidebar-size="lg" data-layout-width="fluid" data-sidebar-image="none"
+  data-preloader="disable">
 
 <head>
 
@@ -12,35 +14,37 @@
   <link rel="shortcut icon" href="/assets/images/favicon.ico">
   <%- HeaderCss %>
 
-  <%- include ('../partials/head-css.ejs') %>
+    <%- include ('../partials/head-css.ejs') %>
 
 </head>
 
 <body>
   <div id="layout-wrapper">
     <%- include ('../partials/topbar') %>
-    <%- include ('../partials/sidebar') %>
-    <div class="main-content overflow-hidden">
-      <div class="page-content">
-        <div class="container-fluid">
-          <%- include ('../partials/page-title') %>
-          <%- body%>
-        </div>
-        <!-- container-fluid -->
-      </div>
-      <!-- End Page-content -->
-      <%- include ('../partials/footer') %>
+      <%- include ('../partials/sidebar') %>
+        <div class="main-content overflow-hidden">
+          <div class="page-content">
+            <div class="container-fluid">
+              <%- include ('../partials/page-title') %>
+                <%- body%>
+            </div>
+            <!-- container-fluid -->
+          </div>
+          <!-- End Page-content -->
+          <%- include ('../partials/footer') %>
 
-    </div>
-    <!-- end main content-->
+        </div>
+        <!-- end main content-->
   </div>
   <!-- END layout-wrapper -->
   <%- include ('../partials/customizer') %>
-  <%- include ('../partials/vendor-scripts') %>
-  <%- FooterJs %>
+    <%- include ('../partials/vendor-scripts') %>
+      <%- FooterJs %>
+        <%- include ('../partials/toast') %>
+          <%- include ('../partials/error-validation') %>
 
-  <!-- App js -->
-  <script src="/assets/js/app.js"></script>
+            <!-- App js -->
+            <script src="/assets/js/app.js"></script>
 </body>
 
 </html>

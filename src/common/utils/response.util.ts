@@ -37,6 +37,7 @@ export class ResponseUtil {
     statusCode = 200,
     requestId?: string,
   ): ApiResponse<T> {
+    message = (data as any)?.message || message;
     return this.createBaseResponse(true, statusCode, message, data, requestId);
   }
 

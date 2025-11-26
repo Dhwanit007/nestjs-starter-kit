@@ -20,8 +20,12 @@
 
         <div class="col">
           <div class="p-2">
-            <h3 class="text-white mb-1">Dhwanit Parani</h3>
-            <p class="text-white text-opacity-75">Software Developer</p>
+            <h3 class="text-white mb-1">
+              <%= authUser ? authUser.name : '' %>
+            </h3>
+            <p class="text-white text-opacity-75">
+              <%= authUser ? authUser.role : '' %>
+            </p>
           </div>
         </div>
       </div>
@@ -42,11 +46,11 @@
               </li>
             </ul>
 
-            <div class="flex-shrink-0">
+            <!-- <div class="flex-shrink-0">
               <a href="/user/pages-profile-settings" class="btn btn-success">
                 <i class="ri-edit-box-line align-bottom"></i> Edit Profile
               </a>
-            </div>
+            </div> -->
           </div>
 
           <!-- Tab panes -->
@@ -65,7 +69,9 @@
                           <tbody>
                             <tr>
                               <th class="ps-0">Full Name :</th>
-                              <td class="text-muted">Dhwanit Parani</td>
+                              <td class="text-muted">
+                                <%= authUser ? authUser.name : '' %>
+                              </td>
                             </tr>
 
                             <tr>
@@ -75,7 +81,9 @@
 
                             <tr>
                               <th class="ps-0">E-mail :</th>
-                              <td class="text-muted">dhwanitparani@email.com</td>
+                              <td class="text-muted">
+                                <%= authUser ? authUser.email : '' %>
+                              </td>
                             </tr>
 
                             <tr>
@@ -123,7 +131,9 @@
                       <h5 class="card-title mb-3">About</h5>
 
                       <p>
-                        Hi, I’m <strong>Dhwanit Parani</strong>, a passionate Software Developer with experience in
+                        Hi, I’m <strong>
+                          <%= authUser ? authUser.name : '' %>
+                        </strong>, a passionate Software Developer with experience in
                         full-stack web development. I enjoy building efficient, scalable, and user-friendly
                         applications using the MERN stack, PHP, MySQL, and TypeScript.
                       </p>
@@ -144,7 +154,9 @@
                             </div>
                             <div class="flex-grow-1 overflow-hidden">
                               <p class="mb-1">Designation :</p>
-                              <h6 class="text-truncate mb-0">Software Developer</h6>
+                              <h6 class="text-truncate mb-0">
+                                <%= authUser ? authUser.role : '' %>
+                              </h6>
                             </div>
                           </div>
                         </div>

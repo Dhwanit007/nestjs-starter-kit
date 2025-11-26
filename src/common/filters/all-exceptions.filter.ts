@@ -9,8 +9,8 @@ import {
 import { randomUUID } from 'crypto';
 import { Request, Response } from 'express';
 
-import { ResponseUtil } from '../utils/response.util';
 import { ApiResponse } from '../interfaces/api-response.interface';
+import { ResponseUtil } from '../utils/response.util';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -27,7 +27,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let payload: any = null;
 
     // Log the exception for debugging
-    this.logException(exception, request, requestId);
+    // this.logException(exception, request, requestId);
 
     const isApi = request.url.startsWith('/api');
 
@@ -45,7 +45,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       // Extract message and payload from HttpException
       if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         message = (exceptionResponse as any).message || message;
-        console.log((exceptionResponse as any).message);
+        // console.log((exceptionResponse as any).message);
         payload = (exceptionResponse as any).payload || exceptionResponse;
       } else if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
@@ -63,9 +63,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const errorResponse = this.createErrorResponse(
       status,
       message,
-      payload,
+      null,
       requestId,
     );
+    if (response.headersSent) {
+      return; // prevents Nest from logging ERR_HTTP_HEADERS_SENT
+    }
 
     response.status(status).json(errorResponse);
   }
@@ -110,22 +113,22 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
   }
 
-  private logException(
-    exception: unknown,
-    request: Request,
-    requestId: string,
-  ) {
-    const { method, url, ip, headers } = request;
-    const userAgent = headers['user-agent'] || '';
+  // private logException(
+  //   exception: unknown,
+  //   request: Request,
+  //   requestId: string,
+  // ) {
+  //   const { method, url, ip, headers } = request;
+  //   const userAgent = headers['user-agent'] || '';
 
-    this.logger.error(`Exception occurred - RequestId: ${requestId}`, {
-      exception: exception instanceof Error ? exception.stack : exception,
-      request: {
-        method,
-        url,
-        ip,
-        userAgent,
-      },
-    });
-  }
+  //   this.logger.error(`Exception occurred - RequestId: ${requestId}`, {
+  //     exception: exception instanceof Error ? exception.stack : exception,
+  //     request: {
+  //       method,
+  //       url,
+  //       ip,
+  //       userAgent,
+  //     },
+  //   });
+  // }
 }

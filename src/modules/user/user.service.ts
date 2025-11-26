@@ -73,6 +73,10 @@ export class UserService {
     return data;
   }
 
+  async countAll() {
+    return await this.repo.count();
+  }
+
   async find(query: PaginateQuery): Promise<Paginated<User>> {
     const results = await paginate(query, this.repo, {
       sortableColumns: [

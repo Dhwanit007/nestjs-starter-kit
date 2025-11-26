@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ProjectsModule } from '../projects/projects.module';
 import { EmployeeApiController } from './controller/employee-api.controller';
-import { EmployeeController } from './employee.controller';
+import { EmployeeController } from './controller/employee.controller';
 import { EmployeeService } from './employee.service';
 import { Employee } from './entities/employee.entity';
 

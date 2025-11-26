@@ -2,9 +2,9 @@ import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EmployeeModule } from '../employee/employee.module';
-import { ProjectApiController } from './controllers/projest-api.controller';
+import { ProjectApiController } from './controllers/project-api.controller';
 import { Projects } from './entities/projects.entity';
-import { ProjectsController } from './projects.controller';
+import { ProjectsController } from './controllers/projects.controller';
 import { ProjectsService } from './projects.service';
 
 @Module({

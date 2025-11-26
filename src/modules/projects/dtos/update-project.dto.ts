@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class UpdateProjectDto {
   @IsString()
@@ -8,6 +8,7 @@ export class UpdateProjectDto {
   @IsString()
   description?: string;
   @IsOptional()
-  @IsString()
+  @IsArray()
+  @IsString({ each: true })
   assignedEmployeeIds?: string[];
 }

@@ -1,14 +1,13 @@
-import { IsOptional, IsString, IsArray } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateDepartmentDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @IsOptional()
   @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsArray()
+  description: string;
+  
   assignedEmployeeIds?: string[];
 }

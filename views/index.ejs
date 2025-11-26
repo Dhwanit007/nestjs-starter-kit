@@ -1,67 +1,93 @@
 <%- contentFor('HeaderCss') %>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
   <%- contentFor('body') %>
-    <div>
-      <hr class="py-2" />
-      <div class="container row">
-          <div id="birthday-calender"></div>
-          <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content text-dark">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="eventTitle"></h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                  <p>
-                    <strong>Details:</strong>
-                    <span id="eventDescription"></span>
-                  </p>
-                </div>
+    <div class="row g-3">
+
+      <!-- Users Card -->
+      <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <p class="text-uppercase fw-medium text-muted mb-0">Users</p>
+                <h4 class="fs-22 fw-semibold mt-3 mb-0">
+                  <%= stats.users %>
+                </h4>
+              </div>
+              <div class="flex-shrink-0 avatar-sm">
+                <span class="avatar-title bg-light text-primary rounded-circle fs-3">
+                  <i class="fa fa-users"></i>
+                </span>
               </div>
             </div>
           </div>
-        <!-- </div> -->
+        </div>
       </div>
+
+      <!-- Employees Card -->
+      <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <p class="text-uppercase fw-medium text-muted mb-0">Employees</p>
+                <h4 class="fs-22 fw-semibold mt-3 mb-0">
+                  <%= stats.employees %>
+                </h4>
+              </div>
+              <div class="flex-shrink-0 avatar-sm">
+                <span class="avatar-title bg-light text-warning rounded-circle fs-3">
+                  <i class="fa fa-id-badge"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Departments Card -->
+      <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <p class="text-uppercase fw-medium text-muted mb-0">Departments</p>
+                <h4 class="fs-22 fw-semibold mt-3 mb-0">
+                  <%= stats.departments %>
+                </h4>
+              </div>
+              <div class="flex-shrink-0 avatar-sm">
+                <span class="avatar-title bg-light text-success rounded-circle fs-3">
+                  <i class="fa fa-building"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects Card -->
+      <div class="col-xl-3 col-md-6">
+        <div class="card card-animate">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <p class="text-uppercase fw-medium text-muted mb-0">Projects</p>
+                <h4 class="fs-22 fw-semibold mt-3 mb-0">
+                  <%= stats.projects %>
+                </h4>
+              </div>
+              <div class="flex-shrink-0 avatar-sm">
+                <span class="avatar-title bg-light text-danger rounded-circle fs-3">
+                  <i class="fa fa-tasks"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+
     <%- contentFor('FooterJs') %>
-
-      <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.4/sp-2.3.5/sl-3.1.3/datatables.min.css"
-        rel="stylesheet" integrity="sha384-6EuzD/mawfVL9CxTC6PpTC8TSynZsJk3YaiS9e/Wx7F8Wc0aAPcE7mL/UyO56DEh"
-        crossorigin="anonymous" />
-
-      <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-2.3.4/sp-2.3.5/sl-3.1.3/datatables.min.js"
-        integrity="sha384-bWwnMIperFy4XITIyXpLSmhNyMa4JoQ3gkaG+xCAnn4FKcCynyVlImUQ2yEO2Eol"
-        crossorigin="anonymous"></script>
-
-      <script src="/assets/js/home/home-datatable.js"></script>
-      <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          var calendarEl = document.getElementById('birthday-calender');
-          var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            events: [
-              {
-                title: '🎂 My Birthday',
-
-                description: 'Annual Birthday Celebration',
-              },
-            ],
-            eventClick: function (info) {
-              info.jsEvent.preventDefault();
-
-              // Fill modal details
-              document.getElementById('eventTitle').textContent = info.event.title;
-              document.getElementById('eventDescription').textContent =
-                info.event.extendedProps.description ||
-                info.event.extendedProps.department ||
-                'N/A';
-
-              // Show Bootstrap modal
-              var modal = new bootstrap.Modal(document.getElementById('eventModal'));
-              modal.show();
-            },
-          });
-          calendar.render();
-        });
-      </script>

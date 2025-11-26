@@ -12,7 +12,7 @@ export class OauthAccessTokenService {
   ) {}
 
   getUserToken(
-    userId: number,
+    userId: string,
     tokenId: string,
   ): Promise<OAuthAccessToken | null> {
     return this.oauthAccessTokenRepository.findOne({
@@ -28,7 +28,7 @@ export class OauthAccessTokenService {
     return this.oauthAccessTokenRepository.save(accessToken);
   }
 
-  async revokeAccessToken(userId: number, tokenId: string): Promise<void> {
+  async revokeAccessToken(userId: string, tokenId: string): Promise<void> {
     const oauthAccessToken = await this.oauthAccessTokenRepository.findOne({
       where: { userId, tokenId },
     });

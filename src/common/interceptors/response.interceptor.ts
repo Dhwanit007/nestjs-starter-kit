@@ -1,44 +1,60 @@
 import {
+  CallHandler,
+  ExecutionContext,
   Injectable,
   NestInterceptor,
-  ExecutionContext,
-  CallHandler,
 } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ResponseUtil } from '../utils/response.util';
-import { ApiResponse } from '../interfaces/api-response.interface';
 
 @Injectable()
-export class ResponseInterceptor<T>
-  implements NestInterceptor<T, ApiResponse<T>>
-{
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<ApiResponse<T>> {
-    return next.handle().pipe(
-      map((data) => {
-        // If data is already in our consistent format, return as-is
-        if (this.isConsistentResponse(data)) {
-          return data;
-        }
+export class ResponseInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const response = context.switchToHttp().getResponse();
 
-        // Otherwise, wrap it in our success response
-        return ResponseUtil.success(data);
+    return next.handle().pipe(
+      map((data: any) => {
+        const { message, messageLBL, payload } = this.extractData(data);
+
+        return {
+          requestId: randomUUID(),
+          success: true,
+          code: response.statusCode,
+          message: message ?? 'Request successful',
+          messageLBL: messageLBL ?? 'SUCCESS',
+          payload: this.normalizePayload(payload),
+        };
       }),
     );
   }
 
-  private isConsistentResponse(data: any): boolean {
-    return (
-      typeof data === 'object' &&
-      data !== null &&
-      'requestId' in data &&
-      'result' in data &&
-      'statusCode' in data &&
-      'message' in data &&
-      'payload' in data
-    );
+  private extractData(data: any) {
+    if (data && typeof data === 'object') {
+      // 🟢 IGNORE success so it doesn't go to payload
+      const { message, messageLBL, success, ...rest } = data;
+
+      return {
+        message,
+        messageLBL,
+        payload: Object.keys(rest).length ? rest : null,
+      };
+    }
+
+    return {
+      message: undefined,
+      messageLBL: undefined,
+      payload: data,
+    };
+  }
+
+  private normalizePayload(payload: any) {
+    if (payload === undefined || payload === null) return null;
+
+    if (typeof payload === 'object' && !Array.isArray(payload)) {
+      if (Object.keys(payload).length === 0) return null;
+    }
+
+    return payload;
   }
 }

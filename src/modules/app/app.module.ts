@@ -1,9 +1,10 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { AuthGuard } from 'src/common/guards/auth.guard';
 import { ViewLocalsMiddleware } from 'src/common/middlewares/view-locals.middleware';
 import { CustomValidationPipe } from 'src/common/pipes/validation.pipe';
 
@@ -48,10 +49,10 @@ import { AppService } from './app.service';
   ],
 })
 export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(ViewLocalsMiddleware)
-  //     .exclude('api/(.*)', 'assets/(.*)')
-  //     .forRoutes('*');
-  // }
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(ViewLocalsMiddleware)
+      .exclude('api/(.*)', 'assets/(.*)')
+      .forRoutes('*');
+  }
 }

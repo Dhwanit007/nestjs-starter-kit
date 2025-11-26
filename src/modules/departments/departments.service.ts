@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -11,60 +11,69 @@ import { Departments } from './entities/department.entity';
 export class DepartmentsService {
   constructor(
     @InjectRepository(Departments)
-    private departmentRepo: Repository<Departments>,
-
-    private employeeService: EmployeeService,
+    private readonly departmentRepo: Repository<Departments>,
+    private readonly employeeService: EmployeeService,
   ) {}
 
-  async create(dto: CreateDepartmentDto) {
-    const department = this.departmentRepo.create(dto);
-    return this.departmentRepo.save(department);
+  async countAll() {
+    return this.departmentRepo.count();
   }
 
-  async findAll2() {
-    const departments =await this.departmentRepo.find();
+  async create(dto: CreateDepartmentDto) {
+    const department = this.departmentRepo.create({
+      name: dto.name,
+      description: dto.description,
+      assignedEmployeeIds: dto.assignedEmployeeIds || [],
+    });
 
-    const result: any = [];
+    const savedDept = await this.departmentRepo.save(department);
 
-    for (const dept of departments) {
-      const ids = Array.isArray(dept.assignedEmployeeIds)
-        ? dept.assignedEmployeeIds
-        : dept.assignedEmployeeIds
-          ? [dept.assignedEmployeeIds]
-          : [];
-
-      const employees = await Promise.all(
-        ids.map((id) => this.employeeService.getById2(id)),
-      );
-
-      result.push({
-        ...dept,
-        assignedEmployees: employees.filter((e) => e),
-      });
+    // Assign employees if provided
+    if (dto.assignedEmployeeIds?.length) {
+      await this.assignEmployees(savedDept.id, dto.assignedEmployeeIds);
     }
 
-    return result
+    return savedDept;
+  }
+
+  async assignEmployees(deptId: string, employeeIds: string[]) {
+    const department = await this.departmentRepo.findOne({
+      where: { id: deptId },
+    });
+
+    if (!department) throw new BadRequestException('Department not found');
+
+    for (const empId of employeeIds) {
+      const employee = await this.employeeService.getById(empId);
+
+      if (!employee) continue;
+      if (employee.department?.id) {
+        throw new BadRequestException(
+          `${employee.name} is already assigned to a department`,
+        );
+      }
+
+      // Assign employee to this department
+      await this.employeeService.assignDepartment(empId, deptId);
+    }
+
+    return this.findOne(deptId);
   }
 
   async findAll() {
     const departments = await this.departmentRepo.find();
-
-    const result: any = [];
+    const result: any[] = [];
 
     for (const dept of departments) {
-      const ids = Array.isArray(dept.assignedEmployeeIds)
-        ? dept.assignedEmployeeIds
-        : dept.assignedEmployeeIds
-          ? [dept.assignedEmployeeIds]
-          : [];
-
       const employees = await Promise.all(
-        ids.map((id) => this.employeeService.getById(id)),
+        (dept.assignedEmployeeIds || []).map((id) =>
+          this.employeeService.getByIdSafe(id),
+        ),
       );
 
       result.push({
         ...dept,
-        assignedEmployees: employees.filter((e) => e),
+        assignedEmployees: employees.filter(Boolean),
       });
     }
 
@@ -77,11 +86,15 @@ export class DepartmentsService {
 
   async update(id: string, dto: UpdateDepartmentDto) {
     await this.departmentRepo.update(id, dto);
+
+    if (dto.assignedEmployeeIds?.length) {
+      await this.assignEmployees(id, dto.assignedEmployeeIds);
+    }
+
     return this.findOne(id);
   }
 
   async remove(id: string) {
-    await this.departmentRepo.softDelete(id);
-    return { deleted: true };
+    return this.departmentRepo.softDelete(id);
   }
 }

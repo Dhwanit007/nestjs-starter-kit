@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
               const text = await response.text();
-              console.error('Response is not JSON:', text.substring(0, 200));
+              // console.error('Response is not JSON:', text.substring(0, 200));
               throw new Error('Server returned HTML instead of JSON. Check if the API endpoint exists.');
             }
       
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
               recordsFiltered: result.meta ? result.meta.totalItems : mapped.length,
             });
           } catch (error) {
-            console.error('DataTable AJAX error:', error);
+            // console.error('DataTable AJAX error:', error);
             callback({
               data: [],
               recordsTotal: 0,

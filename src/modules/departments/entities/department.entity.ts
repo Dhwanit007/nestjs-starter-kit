@@ -3,9 +3,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { Employee } from '../../../modules/employee/entities/employee.entity';
 
 @Entity('departments')
 export class Departments {
@@ -30,4 +34,7 @@ export class Departments {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToMany(() => Employee, (employee) => employee.department)
+  employee: Employee;
 }

@@ -1,13 +1,17 @@
-import { Projects } from '../../../modules/projects/entities/projects.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { Departments } from '../../../modules/departments/entities/department.entity';
+import { Projects } from '../../../modules/projects/entities/projects.entity';
 
 export enum Role {
   Admin = 'Admin',
@@ -45,6 +49,12 @@ export class Employee {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  // @OneToMany(() => Projects, (project) => project.employee)
-  // projects: Projects[];
+  @ManyToMany(() => Projects, (project) => project.employees)
+  projects: Projects[];
+
+  @ManyToOne(() => Departments, (department) => department.employee)
+  department: Departments;
+
+  @Column({ nullable: true })
+  departmentId: string; // store FK in DB
 }

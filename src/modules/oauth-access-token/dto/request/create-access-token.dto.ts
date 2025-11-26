@@ -2,7 +2,7 @@ import { IsDate, IsNumber, IsUUID, MinDate } from 'class-validator';
 
 export class CreateAccessTokenDto {
   @IsNumber()
-  userId: number;
+  userId: string;
 
   @IsUUID()
   tokenId: string;

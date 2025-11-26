@@ -11,6 +11,7 @@ import { ApiAuthController } from './controllers/Api/api-auth.controller';
 import { OauthAccessTokenModule } from '../oauth-access-token/oauth-access-token.module';
 import { LoginController } from './controllers/Web/login.controller';
 import { RegisterController } from './controllers/Web/register.controller';
+import { EmployeeModule } from '../employee/employee.module';
 
 @Module({
   controllers: [
@@ -21,6 +22,7 @@ import { RegisterController } from './controllers/Web/register.controller';
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   imports: [
+    EmployeeModule,
     ConfigModule,
     UserModule,
     PassportModule,
