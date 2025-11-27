@@ -26,7 +26,7 @@ export class DepartmentsController {
 
   @Get()
   departmentsPage(@Res() res, @Req() req) {
-    res.render('departments/department', {
+    res.render('departments/index', {
       title: 'Departments',
       page_title: 'Departments',
       folder: 'Departments',
@@ -49,7 +49,7 @@ export class DepartmentsController {
 
     // Filter employees who are not assigned to any department
     const availableEmployees = employees.filter((emp) => !emp.departmentId);
-    console.log(availableEmployees);
+    // console.log(availableEmployees);
 
     res.render('departments/create', {
       title: 'Create Department',
@@ -64,9 +64,18 @@ export class DepartmentsController {
   @Post('create')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() body: CreateDepartmentDto, @Req() req, @Res() res) {
-    await this.departmentsService.create(body);
-    req.flash('toast', 'Department Created Sucessfully');
-    return res.redirect('/departments');
+    const department = this.departmentsService.findOne(body.name);
+    if (!department) {
+      await this.departmentsService.create(body);
+      req.flash('toast', 'Department Created Sucessfully');
+      return res.redirect('/departments');
+    } else {
+      req.flash('toast', {
+        type: 'error',
+        message: 'Department already Exists!',
+      });
+      res.redirect('/departments');
+    }
   }
 
   @Get('all')

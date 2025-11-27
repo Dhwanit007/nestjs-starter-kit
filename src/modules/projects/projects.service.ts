@@ -100,6 +100,10 @@ export class ProjectsService {
     return await this.projectsRepository.count();
   }
 
+  async getProjectByName(name: string) {
+    return await this.projectsRepository.findBy({ name });
+  }
+
   async getProjectById(id: string): Promise<Projects> {
     const project = await this.projectsRepository.findOne({ where: { id } });
     if (!project) {
@@ -128,6 +132,9 @@ export class ProjectsService {
     // Update basic fields
     if (dto.name !== undefined) project.name = dto.name;
     if (dto.description !== undefined) project.description = dto.description;
+
+    // Update status if provided
+    if (dto.status !== undefined) project.status = dto.status;
 
     // VERY IMPORTANT: Update employee IDs array properly
     if (dto.assignedEmployeeIds !== undefined) {

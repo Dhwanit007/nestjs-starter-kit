@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -42,7 +43,11 @@ export class DepartmentsApiController {
   // GET /api/department/:id
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.departmentsService.findOne(id);
+    const dept = await this.departmentsService.findOne(id);
+    if (!dept) {
+      throw new NotFoundException('Department not found');
+    }
+    return dept;
   }
 
   // PATCH /api/department/:id

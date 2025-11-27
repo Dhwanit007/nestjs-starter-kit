@@ -69,6 +69,22 @@
                                 <select id="editAssignedEmployees" class="form-control" multiple>
                                 </select>
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select id="editProjectStatus" class="form-control">
+                                    <% if (typeof statusOptions !=='undefined' && Array.isArray(statusOptions)) { %>
+                                        <% statusOptions.forEach(function(opt) { %>
+                                            <option value="<%= opt %>">
+                                                <%= opt %>
+                                            </option>
+                                            <% }) %>
+                                                <% } else { %>
+                                                    <option value="Active">Active</option>
+                                                    <option value="Completed">Completed</option>
+                                                    <% } %>
+                                </select>
+                            </div>
                         </form>
                     </div>
 
@@ -126,7 +142,7 @@
 
             <script src="/assets/js/project/index.js"></script>
             <!-- Dependencies -->
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 
             <!-- Datatables -->
             <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>

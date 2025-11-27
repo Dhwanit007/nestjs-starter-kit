@@ -100,33 +100,33 @@ export class UserController {
     });
   }
 
-  @Put('/:id/update')
-  async updateUserById(
-    @Param('id') id: string,
-    @Body()
-    body: {
-      name: string | undefined;
-      email: string | undefined;
-      phoneNumber: string | undefined;
-    },
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    try {
-      const user = await this.userService.update(parseInt(id), {
-        name: body.name,
-        email: body.email,
-        phoneNumber: body.phoneNumber,
-      });
+  // @Put('/:id/update')
+  // async updateUserById(
+  //   @Param('id') id: string,
+  //   @Body()
+  //   body: {
+  //     name: string | undefined;
+  //     email: string | undefined;
+  //     phoneNumber: string | undefined;
+  //   },
+  //   @Req() req: Request,
+  //   @Res() res: Response,
+  // ) {
+  //   try {
+  //     const user = await this.userService.update(parseInt(id), {
+  //       name: body.name,
+  //       email: body.email,
+  //       phoneNumber: body.phoneNumber,
+  //     });
 
-      if (!user) {
-        console.error('User not found');
-      }
-      return res.redirect('/users/' + id);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  //     if (!user) {
+  //       console.error('User not found');
+  //     }
+  //     return res.redirect('/users');
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
 
   @Post()
   async createUser(

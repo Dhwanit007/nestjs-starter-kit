@@ -50,8 +50,8 @@ export class EmployeeApiController {
   }
 
   @Get()
-  async getAllEmployees() {
-    return this.employeeservice.getAllEmployees();
+  async getAllEmployees(@Paginate() query: PaginateQuery) {
+    return this.employeeservice.getAllEmployees(query);
   }
 
   @Get('count/all')

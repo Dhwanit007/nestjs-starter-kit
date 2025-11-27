@@ -42,19 +42,18 @@ export class ProjectApiController {
     @Param('id') id: string,
     @Body() body: UpdateProjectDto,
     @Req() req,
-    @Res() res,
   ) {
-    await this.projectService.updateProject(id, body);
+    const updated = await this.projectService.updateProject(id, body);
     req.flash('toast', 'Project Updated Successfully');
-    res.redirect('/projects');
+    return { message: 'Project Updated Successfully', data: updated };
   }
 
   // Delete('delete/:id')
   @Delete('delete/:id')
-  async delete(@Param('id') id: string, @Req() req, @Res() res) {
+  async delete(@Param('id') id: string, @Req() req) {
     await this.projectService.deleteProject(id);
     req.flash('toast', 'Project Deleted Successfully');
-    res.redirect('/projects');
+    return { message: 'Project Deleted Successfully' };
   }
 
   // -----------------------------
@@ -81,8 +80,13 @@ export class ProjectApiController {
   // -----------------------------
   @Patch(':id')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  async update2(@Param('id') id: string, @Body() body: UpdateProjectDto) {
+  async update2(
+    @Param('id') id: string,
+    @Body() body: UpdateProjectDto,
+    @Req() req,
+  ) {
     const updated = await this.projectService.updateProject(id, body);
+    req.flash('toast', 'Project Updated Successfully');
     return { message: 'Project Updated Successfully', data: updated };
   }
 

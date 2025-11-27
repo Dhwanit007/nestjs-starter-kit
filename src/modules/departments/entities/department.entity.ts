@@ -16,15 +16,15 @@ export class Departments {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column({ nullable: true })
   description: string;
 
   // Store assigned employee IDs as JSON (same as projects)
-  @Column('json', { nullable: true })
-  assignedEmployeeIds: string[];
+  // @Column('json', { nullable: true })
+  // assignedEmployeeIds: string[];
 
   @CreateDateColumn()
   createdAt: Date;

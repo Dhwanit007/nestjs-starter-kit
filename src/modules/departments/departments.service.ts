@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -12,6 +17,7 @@ export class DepartmentsService {
   constructor(
     @InjectRepository(Departments)
     private readonly departmentRepo: Repository<Departments>,
+    @Inject(forwardRef(() => EmployeeService))
     private readonly employeeService: EmployeeService,
   ) {}
 
@@ -20,20 +26,19 @@ export class DepartmentsService {
   }
 
   async create(dto: CreateDepartmentDto) {
-    const department = this.departmentRepo.create({
-      name: dto.name,
-      description: dto.description,
-      assignedEmployeeIds: dto.assignedEmployeeIds || [],
-    });
+    const dept = this.departmentRepo.findOne({ where: { name: dto.name } });
+    if (!dept) {
+      const department = this.departmentRepo.create({
+        name: dto.name,
+        description: dto.description,
+        // assignedEmployeeIds: dto.assignedEmployeeIds || [],
+      });
 
-    const savedDept = await this.departmentRepo.save(department);
-
-    // Assign employees if provided
-    if (dto.assignedEmployeeIds?.length) {
-      await this.assignEmployees(savedDept.id, dto.assignedEmployeeIds);
+      const savedDept = await this.departmentRepo.save(department);
+      return savedDept;
+    } else {
+      throw new BadRequestException('Department already exists!');
     }
-
-    return savedDept;
   }
 
   async assignEmployees(deptId: string, employeeIds: string[]) {
@@ -64,32 +69,59 @@ export class DepartmentsService {
     const departments = await this.departmentRepo.find();
     const result: any[] = [];
 
-    for (const dept of departments) {
-      const employees = await Promise.all(
-        (dept.assignedEmployeeIds || []).map((id) =>
-          this.employeeService.getByIdSafe(id),
-        ),
-      );
+    // for (const dept of departments) {
+    //   const employees = await Promise.all(
+    //     (dept.assignedEmployeeIds || []).map((id) =>
+    //       this.employeeService.getByIdSafe(id),
+    //     ),
+    //   );
 
-      result.push({
-        ...dept,
-        assignedEmployees: employees.filter(Boolean),
-      });
-    }
+    //   result.push({
+    //     ...dept,
+    //     assignedEmployees: employees.filter(Boolean),
+    //   });
+    // }
 
-    return result;
+    return departments;
   }
 
   async findOne(id: string) {
     return this.departmentRepo.findOne({ where: { id } });
   }
 
+  // async update(id: string, dto: UpdateDepartmentDto) {
+  //   await this.departmentRepo.update(id, dto);
+
+  //   if (dto.assignedEmployeeIds?.length) {
+  //     await this.assignEmployees(id, dto.assignedEmployeeIds);
+  //   }
+
+  //   return this.findOne(id);
+  // }
+
   async update(id: string, dto: UpdateDepartmentDto) {
+    // 1. Update the department details
     await this.departmentRepo.update(id, dto);
 
-    if (dto.assignedEmployeeIds?.length) {
-      await this.assignEmployees(id, dto.assignedEmployeeIds);
-    }
+    // const selectedIds = dto.assignedEmployeeIds || [];
+
+    // 2. Pehle se jo is department me employees assigned hai
+    // const existingEmployees = await this.employeeService.findByDepartment(id);
+    // const existingIds = existingEmployees.map((e) => e.id);
+
+    // 3. Jo selected me nahi hai → unko null karo
+    // const unselectedIds = existingIds.filter(
+    //   (eId) => !selectedIds.includes(eId),
+    // );
+
+    // if (unselectedIds.length > 0) {
+    //   await this.employeeService.removeDepartmentFromEmployees(unselectedIds);
+    // }
+
+    // // 4. Selected employees ko department assign karo
+    // if (selectedIds.length > 0) {
+    //   await this.employeeService.assignDepartmentToEmployees(id, selectedIds);
+    // }
 
     return this.findOne(id);
   }

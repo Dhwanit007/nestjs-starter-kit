@@ -8,6 +8,4 @@ export class CreateDepartmentDto {
   @IsOptional()
   @IsString()
   description: string;
-  
-  assignedEmployeeIds?: string[];
 }

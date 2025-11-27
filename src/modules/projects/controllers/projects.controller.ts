@@ -8,9 +8,10 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-
 import { EmployeeService } from 'src/modules/employee/employee.service';
+
 import { CreateProjectDto } from '../dtos/create-project.dto';
+import { Status } from '../entities/projects.entity';
 import { ProjectsService } from '../projects.service';
 
 @Controller('projects')
@@ -21,11 +22,12 @@ export class ProjectsController {
   ) {}
   @Get()
   async getProjects(@Req() req, @Res() res) {
-    return res.render('projects/projects', {
+    return res.render('projects/index', {
       title: 'Projects',
       page_title: 'Projects',
       folder: 'Projetcs',
       message: req.flash('toast'),
+      statusOptions: Object.values(Status),
       error: {},
     });
   }
@@ -48,13 +50,19 @@ export class ProjectsController {
       employees,
     });
   }
-  
+
   @Post('create')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateProjectDto, @Req() req, @Res() res) {
-    // console.log(dto);
-    await this.projectService.createProject(dto);
-    req.flash('toast', 'Project Created Successfully');
-    return res.redirect('/projects');
+    const exists = this.projectService.getProjectByName(dto.name);
+    if (!exists) {
+      // console.log(dto);
+      await this.projectService.createProject(dto);
+      req.flash('toast', 'Project Created Successfully');
+      return res.redirect('/projects');
+    } else {
+      req.flash('toast', { type: 'error', message: 'Project Already Exists' });
+      res.redirect('/projects');
+    }
   }
 }

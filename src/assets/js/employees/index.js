@@ -5,6 +5,13 @@ $(document).ready(function () {
     table = $('#employeesTable').DataTable({
         serverSide: true,
         processing: true,
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.childRowImmediate,
+                type: ''
+            }
+        },
+        autoWidth: false,
 
         ajax: {
             url: '/employee/newall',
@@ -18,7 +25,10 @@ $(document).ready(function () {
                 if (data.order.length > 0) {
                     const order = data.order[0];
                     let columnName = data.columns[order.column].data;
-                    params.sortBy = `${columnName}:${order.dir.toUpperCase()}`;
+
+                    if (columnName && columnName !== "null" && columnName !== "") {
+                        params.sortBy = `${columnName}:${order.dir.toUpperCase()}`;
+                    }
                 }
 
                 return params;
@@ -57,7 +67,7 @@ $(document).ready(function () {
             {
                 data: 'department',
                 render: function (dept) {
-                    return dept ? dept.name : 'N/A';
+                    return dept ? `<span data-dept-id="${dept.id}">${dept.name}</span>` : 'N/A';
                 }
             },
             {
@@ -67,7 +77,9 @@ $(document).ready(function () {
                             <button class="btn btn-sm btn-primary edit-btn"
                                 data-id="${data.id}"
                                 data-name="${data.name}"
-                                data-email="${data.email}">
+                                data-email="${data.email}"
+                                data-role="${data.role}"
+                                data-department-id="${data.department ? data.department.id : ''}">
                                 Edit
                             </button>
 
@@ -94,24 +106,6 @@ $(document).ready(function () {
         $('#addEmployeeModal').modal('show')
     })
 
-    // OPEN EDIT MODAL
-    $(document).on('click', '.edit-btn', function () {
-
-
-        const id = $(this).data('id');
-        const name = $(this).data('name');
-        const email = $(this).data('email');
-
-        $('#edit-id').val(id);
-        $('#edit-name').val(name);
-        $('#edit-email').val(email);
-
-        $('#editEmployeeForm').attr('action', `/employee/update/${id}`);
-
-        $('#editEmployeeModal').modal('show');
-    });
-
-    // Delete modal and submit logic
     const deleteform = document.getElementById('delete-form')
     const deleteModal = document.getElementById('deleteConfirmationModal')
 
@@ -122,16 +116,37 @@ $(document).ready(function () {
         deleteform.action = `/employee/delete/${rowId}`;
     })
 
-    // Edit modal and submit logic
-    const editForm = document.getElementById('editEmployeeForm')
-    const editModal = document.getElementById('editEmployeeModal')
+    $(document).on('click', '.edit-btn', async function () {
+        const id = $(this).data('id');
 
-    editModal.addEventListener('show.bs.modal', function (edit) {
-        const button = edit.relatedTarget;
-        const rowId = button.getAttribute('data-row-id');
+        // Fill inputs
+        $('#edit-id').val(id);
+        $('#edit-name').val($(this).data('name'));
+        $('#edit-email').val($(this).data('email'));
+        $('#edit-role').val($(this).data('role'));
 
-        editForm.action = `/employee/update/${rowId}`
-    })
+        const selectedDeptId = $(this).data('department-id');
+
+        // Fetch departments
+        const res = await fetch('/departments/all').then(r => r.json());
+
+        // Convert payload object → array
+        const departments = Object.values(res.payload);
+
+        console.log("Converted departments:", departments);
+
+        // Build option list
+        const deptOptions = `<option value="">-- Select Department --</option>` + departments
+            .map(d => `<option value="${d.id}" ${d.id === selectedDeptId ? 'selected' : ''}>${d.name}</option>`)
+            .join('');
+
+        $('#edit-department').html(deptOptions);
+
+        // Set form action
+        $('#editEmployeeForm').attr('action', `/employee/update/${id}`);
+
+        $('#editEmployeeModal').modal('show');
+    });
 
 
     $('#deleteSelectedBtn').click(function () {

@@ -1,16 +1,25 @@
 import { Transform } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateProjectDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
   @IsNotEmpty()
   @IsString()
   description: string;
 
-  @IsNotEmpty({message:'Please Select Atleat One Employee in the below field'})
+  // Make assignedEmployeeIds optional for create; if not provided it will be null/undefined
+  @IsOptional()
   @IsArray()
-  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
-  assignedEmployeeIds: string[];
+  @IsString({ each: true })
+  @Transform(({ value }) =>
+    value === undefined || value === null
+      ? undefined
+      : Array.isArray(value)
+        ? value
+        : [value],
+  )
+  assignedEmployeeIds?: string[];
 }

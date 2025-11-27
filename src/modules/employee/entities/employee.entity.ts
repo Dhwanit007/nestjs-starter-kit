@@ -53,8 +53,8 @@ export class Employee {
   projects: Projects[];
 
   @ManyToOne(() => Departments, (department) => department.employee)
-  department: Departments;
+  department: Departments | null;
 
   @Column({ nullable: true })
-  departmentId: string; // store FK in DB
+  departmentId: string | null; // store FK in DB
 }

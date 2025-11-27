@@ -34,7 +34,7 @@
                             </div>
 
                             <!-- Assigned Employees -->
-                            <div class="mb-3">
+                            <!-- <div class="mb-3">
                                 <label class="form-label">Assign Employees</label>
                                 <select name="assignedEmployeeIds" id="assignedEmployeeIds" autocomplete="name"
                                     class="form-control" multiple>
@@ -48,7 +48,7 @@
                                                     <option disabled>No employees found</option>
                                                     <% } %>
                                 </select>
-                            </div>
+                            </div> -->
 
                             <!-- Submit Button -->
                             <button class="btn btn-primary w-100 mt-3">Create Project</button>
@@ -65,9 +65,11 @@
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
             <script>
-                $('#assignedEmployeeIds').select2({
-                    placeholder: "Select employees",
-                    allowClear: true,
-                    width: '100%'
-                });
+                if ($('#assignedEmployeeIds').length) {
+                    $('#assignedEmployeeIds').select2({
+                        placeholder: "Select employees",
+                        allowClear: true,
+                        width: '100%'
+                    });
+                }
             </script>

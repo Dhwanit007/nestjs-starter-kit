@@ -19,6 +19,7 @@ import { Paginate } from 'nestjs-paginate';
 import { title } from 'process';
 
 import { CreateEmployeeDto } from '../dto/create-employee.dto';
+import { UpdateEmployeeDto } from '../dto/update-employee.dto';
 import { EmployeeService } from '../employee.service';
 import { Employee } from '../entities/employee.entity';
 
@@ -49,14 +50,25 @@ export class EmployeeController {
     return res.json({ data: employees });
   }
 
+  // @Get('newall')
+  // async getEmployee(
+  //   @Paginate() query: PaginateQuery,
+  //   @Res() res,
+  // ): Promise<any> {
+  //   const emp: Paginated<Employee> =
+  //     await this.employeeservice.getAllEmployees(query);
+  //   // console.log(emp.data);
+  //   return res.json({
+  //     data: emp.data,
+  //     recordsTotal: emp.meta.totalItems,
+  //     recordsFiltered: emp.meta.totalItems,
+  //   });
+  // }
+
   @Get('newall')
-  async getEmployee(
-    @Paginate() query: PaginateQuery,
-    @Res() res,
-  ): Promise<any> {
-    const emp: Paginated<Employee> =
-      await this.employeeservice.getAllEmployees(query);
-    // console.log(emp.data)
+  async getEmployee(@Paginate() query: PaginateQuery, @Res() res) {
+    const emp = await this.employeeservice.getAllEmployees(query);
+
     return res.json({
       data: emp.data,
       recordsTotal: emp.meta.totalItems,
@@ -172,8 +184,16 @@ export class EmployeeController {
 
   // Update employee
   @Post('update/:id')
-  async updateEmployee(@Param('id') id: string, @Req() req, @Res() res) {
-    await this.employeeservice.update(id, req.body);
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async updateEmployee(
+    @Param('id') id: string,
+    @Body() dto: UpdateEmployeeDto,
+    @Req() req,
+    @Res() res,
+  ) {
+    console.log(dto.departmentId);
+
+    await this.employeeservice.update(id, dto);
     req.flash('toast', 'Employee Updated Successfully');
     return res.redirect('/employee');
   }

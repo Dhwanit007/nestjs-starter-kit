@@ -19,17 +19,17 @@ $(document).ready(function () {
                 }
             },
             { data: "name" },
-            {
-                data: "assignedEmployees",
-                render: function (employees) {
-                    if (!employees || employees.length === 0) {
-                        return `<span class="text-muted">No Employees</span>`;
-                    }
-                    return employees.map(e =>
-                        `<span class="badge bg-info text-dark">${e.name}</span>`
-                    ).join(" ");
-                }
-            },
+            // {
+            //     data: "assignedEmployees",
+            //     render: function (employees) {
+            //         if (!employees || employees.length === 0) {
+            //             return `<span class="text-muted">No Employees</span>`;
+            //         }
+            //         return employees.map(e =>
+            //             `<span class="badge bg-info text-dark">${e.name}</span>`
+            //         ).join(" ");
+            //     }
+            // },
             {
                 data: "createdAt",
                 render: function (date) {
@@ -83,7 +83,7 @@ editDeptModal.addEventListener('show.bs.modal', async function (event) {
     const button = event.relatedTarget;
     const deptId = button.getAttribute('data-id');
 
-    console.log("DEPT ID =", deptId);
+    // console.log("DEPT ID =", deptId);
 
     // Set hidden ID
     document.getElementById('editDeptId').value = deptId;
@@ -95,7 +95,7 @@ editDeptModal.addEventListener('show.bs.modal', async function (event) {
     const res = await fetch(`/departments/api/${deptId}`);
     const data = await res.json();
 
-    console.log("DEPT DATA =", data);
+    // console.log("DEPT DATA =", data);
 
     const dept = data.payload;
 
