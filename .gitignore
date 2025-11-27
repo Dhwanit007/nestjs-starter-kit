@@ -59,6 +59,7 @@ Thumbs.db
 .env.production.local
 .env.local
 .env
+.env.copy
 
 # Temp files
 .temp
