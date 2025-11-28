@@ -25,10 +25,9 @@ export class ProjectApiController {
   constructor(private projectService: ProjectsService) {}
 
   @Get('getall')
-  async getAll(@Req() req, @Res() res) {
+  async getAll(@Req() req) {
     const projects = await this.projectService.findAllProjects();
-    // console.log(projects);
-    return res.json({ data: projects });
+    return { data: projects };
   }
 
   @Get('newall')

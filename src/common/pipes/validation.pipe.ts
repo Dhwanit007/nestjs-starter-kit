@@ -40,8 +40,8 @@ export class CustomValidationPipe implements PipeTransform<any> {
 
       const isApi = this.request.url.startsWith('/api');
 
-      console.log(formattedErrors, 'formatted');
-      console.log(errors, 'errors');
+      // console.log(formattedErrors, 'formatted');
+      // console.log(errors, 'errors');
       if (isApi) {
         // For API -> throw JSON error
         throw new BadRequestException({

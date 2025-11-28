@@ -14,5 +14,11 @@ export class ProjectListDto {
   assignedEmployeeIds: string[];
 
   @Expose()
+  createdAt: Date;
+
+  @Expose()
+  deadline: Date;
+
+  @Expose()
   status: string;
 }

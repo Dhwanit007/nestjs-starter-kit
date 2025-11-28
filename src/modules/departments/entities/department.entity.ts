@@ -36,5 +36,5 @@ export class Departments {
   deletedAt: Date;
 
   @OneToMany(() => Employee, (employee) => employee.department)
-  employee: Employee;
+  employee: Employee[];
 }

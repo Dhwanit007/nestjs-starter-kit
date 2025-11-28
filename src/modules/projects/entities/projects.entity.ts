@@ -50,4 +50,7 @@ export class Projects {
     default: Status.Active,
   })
   status: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  deadline?: Date | null;
 }

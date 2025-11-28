@@ -79,7 +79,7 @@ export class AuthController {
     if (!user) {
       req.flash('toast', {
         type: 'error',
-        message: 'Invalid email',
+        message: 'Invalid Credentials',
       });
       return res.redirect('/login');
     }
@@ -97,7 +97,7 @@ export class AuthController {
     if (storedHash !== derived.toString('hex')) {
       req.flash('toast', {
         type: 'error',
-        message: 'Invalid email or password',
+        message: 'Invalid Credentials',
       });
       return res.redirect('/login');
     }

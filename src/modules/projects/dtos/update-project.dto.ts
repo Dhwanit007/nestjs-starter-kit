@@ -1,4 +1,10 @@
-import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 import { Status } from '../entities/projects.entity';
 
@@ -19,4 +25,8 @@ export class UpdateProjectDto {
   @IsOptional()
   @IsEnum(Status)
   status?: Status;
+
+  @IsOptional()
+  @IsDateString()
+  deadline?: string;
 }

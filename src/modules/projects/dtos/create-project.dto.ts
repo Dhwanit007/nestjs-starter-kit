@@ -1,5 +1,11 @@
 import { Transform } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateProjectDto {
   @IsString()
@@ -22,4 +28,8 @@ export class CreateProjectDto {
         : [value],
   )
   assignedEmployeeIds?: string[];
+
+  @IsOptional()
+  @IsDateString()
+  deadline?: string;
 }

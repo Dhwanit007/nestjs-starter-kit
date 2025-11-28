@@ -5,7 +5,7 @@
     <!-- Dark Logo-->
     <a href="/index" class="logo logo-dark">
       <span class="logo-sm">
-        <img src="/assets/images/logo-sm-td.png" alt="" height="50" />
+        <img src="/assets/images/light.png" alt="" height="40" />
       </span>
       <span class="logo-lg">
         <img src="/assets/images/light.png" alt="" height="75" width="100" />
@@ -14,7 +14,7 @@
     <!-- Light Logo-->
     <a href="/index" class="logo logo-light">
       <span class="logo-sm">
-        <img src="/assets/images/logo-sm-td.png" alt="" height="50" />
+        <img src="/assets/images/dark.png" alt="" height="40" />
       </span>
       <span class="logo-lg">
         <img src="/assets/images/dark.png" alt="" height="75" width="100" />
@@ -29,40 +29,51 @@
     <div class="container-fluid">
       <div id="two-column-menu"></div>
       <ul class="navbar-nav" id="navbar-nav">
-        <li class="menu-title"><span data-key="t-menu">Menu</span></li>
+        <% const current=(typeof currentUrl !=='undefined' && currentUrl) ? currentUrl : '' ; %>
+          <% const cmsActive=current.startsWith('/employee') || current.startsWith('/projects') ||
+            current.startsWith('/departments'); %>
+            <li class="menu-title"><span data-key="t-menu"><span>Menu</span></li>
 
-        <li class="nav-item">
-          <a href="/" class="nav-link"> <i class="ri-home-4-line"></i> Home </a>
-        </li>
-        <li class="nav-item">
-          <a href="/users" class="nav-link"> <i class="ri-user-3-line"></i> Users </a>
-        </li>
-        <li class="nav-item">
-          <a href="/todos" class="nav-link"> <i class="ri-todo-line"></i> Todo </a>
-        </li>
+            <li class="nav-item">
+              <a href="/" class="nav-link <%= current === '/' ? 'active' : '' %>"> <i class="ri-home-4-line"></i><span>
+                  Home</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/users" class="nav-link <%= current.startsWith('/users') ? 'active' : '' %>"> <i
+                  class="ri-user-3-line"></i><span> Users</span> </a>
+            </li>
+            <li class="nav-item">
+              <a href="/todos" class="nav-link <%= current.startsWith('/todos') ? 'active' : '' %>"> <i
+                  class="ri-todo-line"></i> <span>Todo</span> </a>
+            </li>
 
-        <!-- CMS Dropdown -->
-        <li class="nav-item">
-          <a class="nav-link menu-link" href="#sidebarCMS" data-bs-toggle="collapse" role="button" aria-expanded="false"
-            aria-controls="sidebarCMS">
-            <i class="ri-folders-line"></i>
-            <span>CMS</span>
-          </a>
+            <!-- CMS Dropdown -->
+            <li class="nav-item">
+              <a class="nav-link menu-link <%= cmsActive ? 'active' : '' %>" href="#sidebarCMS"
+                data-bs-toggle="collapse" role="button" aria-expanded="<%= cmsActive ? 'true' : 'false' %>"
+                aria-controls="sidebarCMS">
+                <i class="ri-folders-line"></i>
+                <span>CMS</span>
+              </a>
 
-          <div class="collapse menu-dropdown" id="sidebarCMS">
-            <ul class="nav nav-sm flex-column">
-              <li class="nav-item">
-                <a href="/employee" class="nav-link"> <i class="ri-group-line"></i> Employees</a>
-              </li>
-              <li class="nav-item">
-                <a href="/projects" class="nav-link"> <i class="ri-pie-chart-box-line"></i> Projects</a>
-              </li>
-              <li class="nav-item">
-                <a href="/departments" class="nav-link"> <i class="ri-database-line"></i> Departments</a>
-              </li>
-            </ul>
-          </div>
-        </li>
+              <div class="collapse menu-dropdown <%= cmsActive ? 'show' : '' %>" id="sidebarCMS">
+                <ul class="nav nav-sm flex-column">
+                  <li class="nav-item">
+                    <a href="/employee" class="nav-link <%= current.startsWith('/employee') ? 'active' : '' %>"> <i
+                        class="ri-group-line"></i> Employees</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/projects" class="nav-link <%= current.startsWith('/projects') ? 'active' : '' %>"> <i
+                        class="ri-pie-chart-box-line"></i> Projects</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/departments" class="nav-link <%= current.startsWith('/departments') ? 'active' : '' %>">
+                      <i class="ri-database-line"></i> Departments</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
       </ul>
     </div>
     <!-- Sidebar -->

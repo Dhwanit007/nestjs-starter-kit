@@ -78,7 +78,7 @@ export class EmployeeController {
 
   @Patch('restore/:id')
   async restoreEmployee(@Param('id') id: string, @Res() res) {
-    console.log(id);
+    // console.log(id);
     const restored = await this.employeeservice.restore(id);
     if (!restored) {
       throw new HttpException(

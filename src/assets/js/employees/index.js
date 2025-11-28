@@ -42,6 +42,7 @@ $(document).ready(function () {
 
         columns: [
             {
+                sortable: false,
                 orderable: false,
                 data: null,
                 render: row => `<input type="checkbox" class="row-checkbox" value="${row.id}">`
@@ -133,7 +134,7 @@ $(document).ready(function () {
         // Convert payload object → array
         const departments = Object.values(res.payload);
 
-        console.log("Converted departments:", departments);
+        // console.log("Converted departments:", departments);
 
         // Build option list
         const deptOptions = `<option value="">-- Select Department --</option>` + departments

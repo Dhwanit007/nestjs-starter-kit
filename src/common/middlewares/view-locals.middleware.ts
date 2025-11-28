@@ -16,6 +16,7 @@ export class ViewLocalsMiddleware implements NestMiddleware {
     }
     res.locals.error = req.flash('error') || [];
     res.locals.oldInput = req.flash('oldInput') || [];
+    res.locals.currentUrl = req.originalUrl || req.url;
     res.locals.toast = req.flash('toast') || [];
     next();
   }

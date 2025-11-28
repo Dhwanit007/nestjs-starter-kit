@@ -16,7 +16,14 @@ export class ProjectsService {
   ) {}
 
   async createProject(dto: CreateProjectDto): Promise<Projects> {
-    const project = this.projectsRepository.create(dto);
+    // Create a proper Projects instance and copy DTO values to avoid incorrect
+    // type inference (repo.create can infer arrays in some overloads).
+    const project = this.projectsRepository.create();
+    Object.assign(project, dto as any);
+    if ((dto as any).deadline) {
+      project.deadline = new Date((dto as any).deadline);
+    }
+
     return this.projectsRepository.save(project);
   }
 
@@ -87,9 +94,11 @@ export class ProjectsService {
         }),
       );
 
+      // Build a plain object to avoid including ORM relations (which can
+      // introduce circular references) and only return the fields needed
+      // by the API / client.
       result.push({
         ...project,
-        assignedEmployees: employees.filter(Boolean), // remove nulls
       });
     }
 
@@ -135,6 +144,11 @@ export class ProjectsService {
 
     // Update status if provided
     if (dto.status !== undefined) project.status = dto.status;
+
+    // Update deadline if provided
+    if (dto.deadline !== undefined) {
+      project.deadline = dto.deadline ? new Date(dto.deadline) : null;
+    }
 
     // VERY IMPORTANT: Update employee IDs array properly
     if (dto.assignedEmployeeIds !== undefined) {

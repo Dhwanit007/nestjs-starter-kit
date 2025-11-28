@@ -40,7 +40,7 @@ $(document).ready(function () {
                 data: "id",
                 render: function (id) {
                     return `
-                    <button class="btn btn-sm btn-warning editDeptBtn" 
+                    <button class="btn btn-sm btn-primary editDeptBtn" 
                 data-id="${id}" 
                 data-bs-toggle="modal" 
                 data-bs-target="#editDepartmentModal">
