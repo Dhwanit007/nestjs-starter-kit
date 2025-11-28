@@ -33,7 +33,11 @@ $(document).ready(function () {
             {
                 data: "createdAt",
                 render: function (date) {
-                    return new Date(date).toLocaleDateString();
+                    return new Date(date).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                    });
                 }
             },
             {

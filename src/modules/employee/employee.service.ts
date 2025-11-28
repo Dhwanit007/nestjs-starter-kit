@@ -76,11 +76,8 @@ export class EmployeeService {
     const existing = await this.emprepo.findOne({
       where: { email: dto.email },
     });
-    // if (existing) {
-    //   throw new BadRequestException('Email already Exists');
-    // }
     if (existing) {
-      return null; // or false
+      throw new BadRequestException('Email already exists');
     }
     // hash password
     const hashedPassword = await this.hashPassword(dto.password);
@@ -99,26 +96,6 @@ export class EmployeeService {
   async remove(id: string) {
     return await this.emprepo.softDelete(id);
   }
-
-  // async update(id: string, dto: UpdateEmployeeDto) {
-  //   const user = await this.emprepo.findOne({ where: { id } });
-  //   // console.log(user);
-  //   console.log(dto);
-  //   if (!user) {
-  //     throw new NotFoundException(`User with id ${id} not found`);
-  //   }
-  //   // const existing = await this.emprepo.findOne({
-  //   //   where: { email: dto.email },
-  //   // });
-  //   // // if (existing) {
-  //   // //   throw new BadRequestException('Email already Exists');
-  //   // // }
-  //   // if (existing) {
-  //   //   return null; // or false
-  //   // }
-  //   Object.assign(user, dto);
-  //   return await this.emprepo.save(user);
-  // }
 
   async update(id: string, dto: UpdateEmployeeDto) {
     // 1️⃣ Find the user

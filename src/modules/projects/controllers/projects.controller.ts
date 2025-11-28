@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Req,
   Res,
@@ -54,7 +56,9 @@ export class ProjectsController {
   @Post('create')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() dto: CreateProjectDto, @Req() req, @Res() res) {
-    const exists = this.projectService.getProjectByName(dto.name);
+    const exists = await this.projectService.getProjectByName(dto.name);
+    // console.log(dto.name);
+    // console.log(exists);
     if (!exists) {
       // console.log(dto);
       await this.projectService.createProject(dto);
@@ -64,5 +68,12 @@ export class ProjectsController {
       req.flash('toast', { type: 'error', message: 'Project Already Exists' });
       res.redirect('/projects');
     }
+  }
+
+  @Delete('delete/:id')
+  async delete(@Param('id') id: string, @Req() req, @Res() res) {
+    await this.projectService.deleteProject(id);
+    req.flash('toast', 'Project Deleted Successfully');
+    res.redirect('/projects');
   }
 }

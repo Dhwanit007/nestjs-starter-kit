@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -16,8 +21,12 @@ export class ProjectsService {
   ) {}
 
   async createProject(dto: CreateProjectDto): Promise<Projects> {
-    // Create a proper Projects instance and copy DTO values to avoid incorrect
-    // type inference (repo.create can infer arrays in some overloads).
+    const existing = await this.projectsRepository.findOne({
+      where: { name: dto.name },
+    });
+    if (existing) {
+      throw new BadRequestException('Project Already Exists');
+    }
     const project = this.projectsRepository.create();
     Object.assign(project, dto as any);
     if ((dto as any).deadline) {
@@ -34,41 +43,6 @@ export class ProjectsService {
     }
     return projects;
   }
-
-  // async findAllProjects() {
-  //   const projects = await this.projectsRepository.find();
-
-  //   const result: any = [];
-
-  //   for (const project of projects) {
-  //     //   let employees: any = [];
-
-  //     //   if (Array.isArray(project.assignedEmployeeIds)) {
-  //     //     employees = await Promise.all(
-  //     //       project.assignedEmployeeIds.map(async (empId) => {
-  //     //         const emp = await this.employeeService.getById(empId);
-  //     //         return emp ? { id: emp.id, name: emp.name } : null;
-  //     //       }),
-  //     //     );
-
-  //     //     employees = employees.filter(Boolean);
-  //     //   }
-
-  //     const ids = Array.isArray(project.assignedEmployeeIds)
-  //       ? project.assignedEmployeeIds
-  //       : [project.assignedEmployeeIds]; // normalize
-
-  //     const employees = await Promise.all(
-  //       ids.map((id) => this.employeeService.getById(id)),
-  //     );
-
-  //     result.push({
-  //       ...project,
-  //       assignedEmployees: employees,
-  //     });
-  //   }
-  //   return result;
-  // }
 
   async findAllProjects() {
     const projects = await this.projectsRepository.find();
@@ -110,7 +84,8 @@ export class ProjectsService {
   }
 
   async getProjectByName(name: string) {
-    return await this.projectsRepository.findBy({ name });
+    // console.log(name);
+    return await this.projectsRepository.findOne({ where: { name } });
   }
 
   async getProjectById(id: string): Promise<Projects> {

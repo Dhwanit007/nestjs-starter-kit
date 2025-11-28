@@ -100,48 +100,19 @@ export class UserController {
     });
   }
 
-  // @Put('/:id/update')
-  // async updateUserById(
-  //   @Param('id') id: string,
-  //   @Body()
-  //   body: {
-  //     name: string | undefined;
-  //     email: string | undefined;
-  //     phoneNumber: string | undefined;
-  //   },
-  //   @Req() req: Request,
-  //   @Res() res: Response,
-  // ) {
-  //   try {
-  //     const user = await this.userService.update(parseInt(id), {
-  //       name: body.name,
-  //       email: body.email,
-  //       phoneNumber: body.phoneNumber,
-  //     });
-
-  //     if (!user) {
-  //       console.error('User not found');
-  //     }
-  //     return res.redirect('/users');
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
   @Post()
   async createUser(
     @Body() body: CreateUserDto,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const data = {
-      name: body.name,
-      email: body.email,
-      phoneNumber: body.phoneNumber,
-      password: body.password,
-    };
+    const exists = await this.userService.findOneByEmail(body.email);
+    if (exists) {
+      req.flash('toast', { type: 'error', message: 'Email Already Exists' });
+      res.redirect('/users/create');
+    }
 
-    const user = await this.userService.create(data);
+    await this.userService.create(body);
     req.flash('toast', 'User Created Successfully');
     return res.redirect('/users');
   }

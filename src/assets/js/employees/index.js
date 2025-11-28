@@ -63,7 +63,11 @@ $(document).ready(function () {
             { data: 'role' },
             {
                 data: 'created_at',
-                render: data => new Date(data).toDateString()
+                render: data => new Date(data).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                })
             },
             {
                 data: 'department',

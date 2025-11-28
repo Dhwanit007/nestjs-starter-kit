@@ -4,15 +4,24 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as crypto from 'crypto';
 import { PaginateQuery, Paginated, paginate } from 'nestjs-paginate';
 import { Repository } from 'typeorm';
+import { promisify } from 'util';
 
 import { UpdateUserDto } from './dto/request/update-user.dto';
 import { User } from './user.entity';
 
+const scrypt = promisify(crypto.scrypt);
 @Injectable()
 export class UserService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {}
+
+  private async hashPassword(password: string): Promise<string> {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const derivedKey = (await scrypt(password, salt, 64)) as Buffer;
+    return `${salt}:${derivedKey.toString('hex')}`;
+  }
 
   async updateUser2(id: number, input: Partial<UpdateUserDto>) {
     const user = await this.repo.findOne({ where: { id } });
@@ -29,48 +38,6 @@ export class UserService {
     await this.repo.delete(user);
 
     return { message: 'User Successfully Deleted!' };
-  }
-
-  async getAgeChartData() {
-    const users = await this.repo.find();
-
-    const data: Record<string, number> = {};
-
-    users.forEach((user) => {
-      if (!user.dob) {
-        return;
-      }
-      const year = user.dob.getFullYear();
-
-      const rangeStart = Math.floor(year / 5) * 5;
-      const rangeEnd = rangeStart + 4;
-
-      const rangeKey = `${rangeStart}-${rangeEnd}`;
-
-      if (!(rangeKey in data)) {
-        data[rangeKey] = 1;
-      } else {
-        data[rangeKey] += 1;
-      }
-    });
-
-    return data;
-  }
-
-  async getGenderChartData() {
-    const users = await this.repo.find();
-
-    const data: Record<string, number> = {};
-
-    users.forEach((user) => {
-      if (!(user.gender in data)) {
-        data[user.gender] = 1;
-      } else {
-        data[user.gender] += 1;
-      }
-    });
-
-    return data;
   }
 
   async countAll() {
@@ -94,7 +61,6 @@ export class UserService {
         'id',
         'createdAt',
         'updatedAt',
-        'language',
       ],
       defaultSortBy: [['id', 'ASC']],
       defaultLimit: 10,
@@ -104,7 +70,8 @@ export class UserService {
 
     return results;
   }
-  findOneByEmail(email: string) {
+
+  async findOneByEmail(email: string) {
     return this.repo.findOne({ where: { email } });
   }
 
@@ -117,16 +84,9 @@ export class UserService {
   }
 
   async create(attributes: Partial<User>) {
-    const checkUser = await this.repo.findOne({
-      where: { email: attributes.email },
-    });
-    if (checkUser) {
-      throw new BadRequestException({
-        email: ['email already exist'],
-        message: 'email already exist',
-      });
-    }
-    const user = this.repo.create(attributes);
+    //@ts-ignore
+    const hashedPassword = await this.hashPassword(attributes.password);
+    const user = this.repo.create({ ...attributes, password: hashedPassword });
     const userSaved = await this.repo.save(user);
     return userSaved;
   }
@@ -141,6 +101,6 @@ export class UserService {
   async remove(id: number) {
     const user = await this.findOne(id);
     if (!user) throw new NotFoundException('user not found');
-    return this.repo.remove(user);
+    return this.repo.softRemove(user);
   }
 }

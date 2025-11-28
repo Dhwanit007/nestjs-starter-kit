@@ -7,7 +7,6 @@ import {
   Patch,
   Post,
   Res,
-  UseInterceptors,
 } from '@nestjs/common';
 import { Paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
@@ -24,34 +23,21 @@ export class EmployeeApiController {
   @Get('newall')
   async getEmployee(
     @Paginate() query: PaginateQuery,
-    @Res() res,
-  ): Promise<any> {
-    const emp: Paginated<Employee> =
-      await this.employeeservice.getAllEmployees(query);
-    return res.json(emp);
-  }
-
-  @Get('deleted/list')
-  async getDeletedEmployeesList(@Res() res) {
-    const employees = await this.employeeservice.findDeletedEmployees();
-
-    return res.json(employees);
+  ): Promise<Paginated<Employee>> {
+    const emp = await this.employeeservice.getAllEmployees(query);
+    console.log(emp);
+    return emp;
   }
 
   @Get('all')
   async getAllEmployeesRaw(@Res() res) {
     const employees = await this.employeeservice.getallEmployees();
-    return res.json({ data: employees });
+    return employees;
   }
 
   @Get('with-department')
   async getAllEmployeesWithDept() {
     return this.employeeservice.getAllEmployeesWithDept();
-  }
-
-  @Get()
-  async getAllEmployees(@Paginate() query: PaginateQuery) {
-    return this.employeeservice.getAllEmployees(query);
   }
 
   @Get('count/all')

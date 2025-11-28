@@ -54,16 +54,11 @@ export class AppController {
   @Get()
   @UseGuards(AuthGuard)
   async getHello(@Res() response: Response, @Req() req: any) {
-    const ageChartData = await this.userService.getAgeChartData();
-    const genderChartData = await this.userService.getGenderChartData();
-
     return response.render('index', {
       title: 'Home',
       page_title: 'Home',
       folder: 'General',
       message: 'Welcome to the Home Page',
-      ageChartData,
-      genderChartData,
     });
   }
 }

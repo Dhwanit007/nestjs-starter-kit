@@ -1,29 +1,30 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
+  NotFoundException,
+  Param,
   Post,
   Put,
-  Delete,
-  Param,
-  Body,
-  NotFoundException,
   UseGuards,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+
+import { Serialize } from '../../../../common/interceptors/serialize.interceptor';
 import { CreateUserDto } from '../../dto/request/create-user.dto';
 import { UpdateUserDto } from '../../dto/request/update-user.dto';
-import { UserService } from '../../user.service';
 import { UserDto } from '../../dto/response/user.dto';
-import { Serialize } from '../../../../common/interceptors/serialize.interceptor';
-import { Paginate, PaginateQuery } from 'nestjs-paginate';
-import { plainToInstance } from 'class-transformer';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { UserService } from '../../user.service';
 
 @Controller('/api/users')
 @UseGuards(JwtAuthGuard)
 export class ApiUserController {
   constructor(private userService: UserService) {}
   @Get()
-  @Serialize()
+  // @Serialize()
   async getUserList(@Paginate() query: PaginateQuery) {
     const result = await this.userService.find(query);
     return {

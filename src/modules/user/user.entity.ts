@@ -30,21 +30,6 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ nullable: true })
-  dob: Date;
-
-  @Column({ default: 'Hindi' })
-  language: string;
-
-  @Column({ default: 'male' })
-  gender: 'male' | 'female';
-
-  // @OneToMany(() => Chat, (chat) => chat.sender)
-  // senderChats: Chat[];
-
-  // @OneToMany(() => Chat, (chat) => chat.recipient)
-  // recipientChats: Chat[];
-
   @CreateDateColumn({ type: 'timestamp', nullable: true })
   createdAt: Date;
 
@@ -53,9 +38,5 @@ export class User {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
-
-  @Expose()
-  accessToken?: string;
-
   /* ----------------------Relationships---------------------- */
 }

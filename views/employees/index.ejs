@@ -140,51 +140,6 @@
             </div>
         </div>
 
-        <!-- Add Employee Modal -->
-        <div class="modal fade" id="addEmployeeModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-
-                    <div class="modal-header bg-light">
-                        <h5 class="modal-title">Add Employee</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <form id="createEmployeeForm" action="/employee/create" method="post">
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label">Full Name</label>
-                                <input type="text" name="name" class="form-control" placeholder="Enter Employee name">
-                                <div class="text-danger error" id="error-name"></div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control"
-                                    placeholder="Enter Employee Email">
-                                <div class="text-danger error" id="error-email"></div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control"
-                                    placeholder="Enter Employee Password">
-                                <div class="text-danger error" id="error-password"></div>
-                            </div>
-
-                        </div>
-
-                        <div class="modal-footer">
-                            <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Create</button>
-                        </div>
-
-                    </form>
-
-                </div>
-            </div>
-        </div>
-
 
         <%- contentFor('FooterJs') %>
 
