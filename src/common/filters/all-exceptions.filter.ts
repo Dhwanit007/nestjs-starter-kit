@@ -59,6 +59,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
       };
     }
 
+    if (status === 404 && !isApi) {
+      // Rendering EJS page for non-API 404
+      return response.status(404).render('auth/auth-404', {
+        layout: 'layouts/layout-without-nav',
+        title: '404',
+        page_title: 'Not Found',
+        folder: 'auth',
+      });
+    }
+
     // Create consistent error response based on status code
     const errorResponse = this.createErrorResponse(
       status,

@@ -54,6 +54,24 @@ export class EmployeeController {
     return res.json(emp);
   }
 
+  @Get('newalldt')
+  async getEmployeeForDT(
+    @Paginate() query: PaginateQuery,
+    @Res() res,
+  ): Promise<any> {
+    const emp: Paginated<Employee> =
+      await this.employeeservice.getAllEmployees(query);
+
+    const dataTablesResponse = {
+      draw: Number(query.page) || 1,
+      recordsTotal: emp.meta.totalItems,
+      recordsFiltered: emp.meta.totalItems,
+      data: emp.data,
+    };
+
+    return res.json(dataTablesResponse);
+  }
+
   @Get('all')
   async getAllEmployeesRaw(@Res() res) {
     const employees = await this.employeeservice.getallEmployees();

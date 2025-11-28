@@ -10,7 +10,19 @@ export class ViewLocalsMiddleware implements NestMiddleware {
     const path = (req.originalUrl || req.url || '').toString();
 
     // treat common public/static and auth routes as allowed without session
-    const publicPrefixes = ['/login', '/register', '/forgotpassword'];
+    const publicPrefixes = [
+      '/login',
+      '/register',
+      '/forgotpassword',
+      '/resetpassword',
+      '/auth',
+      '/public',
+      '/assets',
+      '/css',
+      '/js',
+      '/images',
+      '/favicon.ico',
+    ];
 
     const isPublic = publicPrefixes.some((p) => path.startsWith(p));
     const isApi =

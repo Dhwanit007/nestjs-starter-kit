@@ -14,13 +14,15 @@ $(document).ready(function () {
         autoWidth: false,
 
         ajax: {
-            url: '/employee/newall',
+            url: '/employee/newalldt',
             data: function (data) {
                 const params = {
                     search: data.search.value,
                     limit: data.length,
                     page: Math.ceil((data.start + 1) / data.length),
                 };
+
+                console.log(data)
 
                 if (data.order.length > 0) {
                     const order = data.order[0];

@@ -24,7 +24,7 @@ export class Projects {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'longtext', nullable: true })
   description: string;
 
   // array of employees ids assigned to the project

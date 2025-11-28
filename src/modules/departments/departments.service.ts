@@ -25,19 +25,24 @@ export class DepartmentsService {
     return this.departmentRepo.count();
   }
 
+  async findByName(name: string) {
+    return await this.departmentRepo.findOne({ where: { name } });
+  }
+
   async create(dto: CreateDepartmentDto) {
-    const dept = this.departmentRepo.findOne({ where: { name: dto.name } });
-    if (!dept) {
+    const exists = await this.departmentRepo.findOne({
+      where: { name: dto.name },
+    });
+    if (exists) {
+      return null;
+    } else {
       const department = this.departmentRepo.create({
         name: dto.name,
         description: dto.description,
-        // assignedEmployeeIds: dto.assignedEmployeeIds || [],
       });
 
       const savedDept = await this.departmentRepo.save(department);
       return savedDept;
-    } else {
-      throw new BadRequestException('Department already exists!');
     }
   }
 
@@ -89,17 +94,13 @@ export class DepartmentsService {
     return this.departmentRepo.findOne({ where: { id } });
   }
 
-  // async update(id: string, dto: UpdateDepartmentDto) {
-  //   await this.departmentRepo.update(id, dto);
-
-  //   if (dto.assignedEmployeeIds?.length) {
-  //     await this.assignEmployees(id, dto.assignedEmployeeIds);
-  //   }
-
-  //   return this.findOne(id);
-  // }
-
   async update(id: string, dto: UpdateDepartmentDto) {
+    const existing = await this.departmentRepo.findOne({
+      where: { name: dto.name },
+    });
+    if (existing) {
+      return null;
+    }
     // 1. Update the department details
     await this.departmentRepo.update(id, dto);
 

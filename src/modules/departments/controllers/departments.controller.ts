@@ -64,18 +64,18 @@ export class DepartmentsController {
   @Post('create')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async create(@Body() body: CreateDepartmentDto, @Req() req, @Res() res) {
-    const department = this.departmentsService.findOne(body.name);
-    if (!department) {
-      await this.departmentsService.create(body);
-      req.flash('toast', 'Department Created Sucessfully');
-      return res.redirect('/departments');
-    } else {
+    const exists = await this.departmentsService.findByName(body.name);
+    //@ts-ignore
+    if (exists) {
       req.flash('toast', {
         type: 'error',
         message: 'Department already Exists!',
       });
       res.redirect('/departments');
     }
+    await this.departmentsService.create(body);
+    req.flash('toast', 'Department Created Sucessfully');
+    return res.redirect('/departments');
   }
 
   @Get('all')
@@ -101,6 +101,16 @@ export class DepartmentsController {
     @Req() req,
     @Res() res,
   ) {
+    //@ts-ignore
+    const existing = this.departmentsService.findByName(body.name);
+    //@ts-ignore
+    if (existing) {
+      req.flash('toast', {
+        type: 'error',
+        message: 'Department already Exists!',
+      });
+      res.redirect('/departments');
+    }
     await this.departmentsService.update(id, body);
     req.flash('toast', 'Department Updated Successfully');
     res.redirect('/departments');

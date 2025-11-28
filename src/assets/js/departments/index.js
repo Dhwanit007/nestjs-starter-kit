@@ -19,17 +19,6 @@ $(document).ready(function () {
                 }
             },
             { data: "name" },
-            // {
-            //     data: "assignedEmployees",
-            //     render: function (employees) {
-            //         if (!employees || employees.length === 0) {
-            //             return `<span class="text-muted">No Employees</span>`;
-            //         }
-            //         return employees.map(e =>
-            //             `<span class="badge bg-info text-dark">${e.name}</span>`
-            //         ).join(" ");
-            //     }
-            // },
             {
                 data: "createdAt",
                 render: function (date) {

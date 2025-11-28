@@ -79,7 +79,19 @@ $(document).ready(function () {
                         return "—";
                     }
                 },
-                { data: 'description' },
+                {
+                    data: "description",
+                    render: function (desc, type, row) {
+                        if (!desc) return "N/A";
+
+                        const short = desc.length > 50 ? desc.substring(0, 50) + "..." : desc;
+
+                        return `
+            <span class="short-desc">${short}</span>
+            ${desc.length > 50 ? `<button class="btn btn-sm btn-success view-full-desc" data-full="${desc.replace(/"/g, '&quot;')}">Read more</button>` : ""}
+        `;
+                    }
+                },
                 { data: 'status' },
                 {
                     data: 'deadline', render: date => date ? new Date(date).toLocaleDateString("en-IN", {
@@ -167,6 +179,15 @@ $(document).ready(function () {
             console.error("Error fetching project data:", err);
             alert("Failed to load project details.");
         }
+    });
+
+    $(document).on("click", ".view-full-desc", function (e) {
+        e.preventDefault();
+
+        const fullDesc = $(this).data("full");
+        $("#fullDescriptionText").text(fullDesc);
+
+        $("#descriptionModal").modal("show");
     });
 
     // Save changes
